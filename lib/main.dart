@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:taxi4hire/LandingScreen/choice.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/routes.dart';
-import 'package:taxi4hire/screens/splash_screen.dart';
+import 'package:taxi4hire/screens/splash/splash_screen.dart';
+import 'package:taxi4hire/screens/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,15 +12,7 @@ void main() async {
     MyApp(
       child: MaterialApp(
         title: 'Taxi 4 Hire',
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
-          fontFamily: "Muli",
-          textTheme: const TextTheme(
-            bodyText1: TextStyle(color: kTextColor),
-            bodyText2: TextStyle(color: kTextColor),
-          ),
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
+        theme: theme(),
         //home: const SplashScreen(),
         initialRoute: SplashScreen.routeName,
         routes: routes,

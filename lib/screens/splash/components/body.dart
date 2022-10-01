@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'package:taxi4hire/size_config.dart';
 
 class Body extends StatefulWidget {
@@ -67,7 +68,9 @@ class _BodyState extends State<Body> {
                     Spacer(flex: 3),
                     DefaultButton(
                       text: "Get Started",
-                      press: () {},
+                      press: () {
+                        Navigator.pushNamed(context, SignInScreen.routeName);
+                      },
                     ),
                     Spacer(),
                   ],

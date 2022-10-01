@@ -13,3 +13,12 @@ const kSecondaryColor = Color(0xFF979797);
 const kTextColor = Color(0xFF757575);
 
 const kAnimationDuration = Duration(milliseconds: 200);
+
+//Form error
+
+const String kUsernameNullError = "Please enter your username";
+const String kInvalidUsernameError = "Please enter a valid username";
+const String kPasswordNullError = "Please enter your password";
+const String kInvalidPasswordError = "Please enter a valid password";
+const String kShortPasswordError = "Password is too short";
+const String kMatchPasswordError = "Password does not match";
