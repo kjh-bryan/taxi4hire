@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:taxi4hire/LandingScreen/choice.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/routes.dart';
 import 'package:taxi4hire/screens/splash/splash_screen.dart';
@@ -46,6 +45,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ));
     return KeyedSubtree(
       key: key,
       child: widget.child!,
