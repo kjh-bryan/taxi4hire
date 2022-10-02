@@ -149,7 +149,9 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 - [x] Splash Screen
 - [x] Sign In
-  - [ ] Sign Up
+  - [x] Sign Up Selection Screen
+    - [ ] Sign Up as Customer
+    - [ ] Sign Up as Taxi Driver
   - [x] Forget Password
 - [ ] Main MapView
   - [ ] Planned Routes
