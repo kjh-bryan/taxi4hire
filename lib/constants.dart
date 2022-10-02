@@ -15,7 +15,11 @@ const kTextColor = Color(0xFF757575);
 const kAnimationDuration = Duration(milliseconds: 200);
 
 //Form error
+final RegExp emailValidatorRegExp =
+    RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
+const String kEmailNullError = "Please enter your email";
+const String kInvalidEmailError = "Please enter a valid email";
 const String kUsernameNullError = "Please enter your username";
 const String kInvalidUsernameError = "Please enter a valid username";
 const String kPasswordNullError = "Please enter your password";

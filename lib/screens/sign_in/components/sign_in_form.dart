@@ -3,6 +3,7 @@ import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/components/form_error.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
 import 'package:taxi4hire/size_config.dart';
 
 class SignForm extends StatefulWidget {
@@ -50,9 +51,13 @@ class _SignFormState extends State<SignForm> {
               ),
               Text("Remember me"),
               Spacer(),
-              Text(
-                "Forget Password",
-                style: TextStyle(decoration: TextDecoration.underline),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(
+                    context, ForgetPasswordScreen.routeName),
+                child: Text(
+                  "Forget Password",
+                  style: TextStyle(decoration: TextDecoration.underline),
+                ),
               ),
             ],
           ),

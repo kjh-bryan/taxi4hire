@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:taxi4hire/components/no_account_text.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
 import 'package:taxi4hire/screens/sign_in/components/sign_in_form.dart';
 import 'package:taxi4hire/size_config.dart';
 
@@ -41,24 +43,7 @@ class Body extends StatelessWidget {
                 SizedBox(
                   height: SizeConfig.screenHeight! * 0.06,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have account? ",
-                      style: TextStyle(
-                        fontSize: getProportionateScreenWidth(16),
-                      ),
-                    ),
-                    Text(
-                      "Sign Up",
-                      style: TextStyle(
-                        fontSize: getProportionateScreenWidth(16),
-                        color: kPrimaryColor,
-                      ),
-                    ),
-                  ],
-                )
+                NoAccountText()
               ],
             ),
           ),
