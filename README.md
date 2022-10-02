@@ -1,4 +1,5 @@
 <a name="readme-top"></a>
+
 <!-- PROJECT SHIELDS -->
 <!--
 *** I'm using markdown "reference style" links for readability.
@@ -7,8 +8,6 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-
-
 
 <!-- PROJECT LOGO -->
 <br />
@@ -30,11 +29,9 @@
     ·
     <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
   </p>
-  
+
 -->
 </div>
-
-
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -62,27 +59,26 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
+
 <div align="center">
 <!--[![Product Name Screen Shot][product-screenshot]](https://example.com)-->
 <img src="screenimages/splash_screen.png" alt="Logo" height="400">
 </div>
 
+Taxi 4 Hire is an application for
 
-Taxi 4 Hire is an application for 
-* Taxi Driver to view surroundings nearby Taxi Drivers to let them know whether the vicinity is crowded thus allowing them to plan where to wait for customer.
-* Customer at Taxi Stand to book a Taxi Driver efficiency.
+- Taxi Driver to view surroundings nearby Taxi Drivers to let them know whether the vicinity is crowded thus allowing them to plan where to wait for customer.
+- Customer at Taxi Stand to book a Taxi Driver efficiency.
 
 <!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
---> 
+-->
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 ### Built With
+
 <!--
 * [![Next][Next.js]][Next-url]
 * [![React][React.js]][React-url]
@@ -94,24 +90,23 @@ Taxi 4 Hire is an application for
 * [![JQuery][JQuery.com]][JQuery-url]
 -->
 
-
-* [![Flutter][Flutter.dev]][Flutter-url]
+- [![Flutter][flutter.dev]][flutter-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 Required to download:
-* Android Studio -> https://developer.android.com/studio
-* Flutter -> https://docs.flutter.dev/get-started/install/windows
+
+- Android Studio -> https://developer.android.com/studio
+- Flutter -> https://docs.flutter.dev/get-started/install/windows
 
 ## Guides on Installation
-* Windows -> https://www.youtube.com/watch?v=03zuAxPjVDI
-* Mac -> https://www.youtube.com/watch?v=JJwBoRMY08U
 
+- Windows -> https://www.youtube.com/watch?v=03zuAxPjVDI
+- Mac -> https://www.youtube.com/watch?v=JJwBoRMY08U
 
 <!--
 ### Prerequisites
@@ -122,20 +117,19 @@ This is an example of how to list things you need to use the software and how to
   npm install npm@latest -g
   ```
 -->
+
 ### Installation
 
 1. Clone the repo
    ```sh
    git clone https://github.com/kjh-bryan/taxi4hire
    ```
-4. Run the project
+2. Run the project
    ```js
    flutter run
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- USAGE EXAMPLES -->
 <!--
@@ -150,14 +144,15 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 -->
 
 <!-- ROADMAP -->
+
 ## Roadmap
 
 - [x] Splash Screen
 - [x] Sign In
-    - [ ] Sign Up
-    - [ ] Forget Password
+  - [ ] Sign Up
+  - [x] Forget Password
 - [ ] Main MapView
-    - [ ] Planned Routes
+  - [ ] Planned Routes
 - [ ] View Booking Request(Taxi Driver)
 - [ ] Book Request(Customer)
 - [ ] Settings
@@ -165,8 +160,6 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues). -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- CONTRIBUTING -->
 <!--
@@ -196,9 +189,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 -->
 
-
-
 <!-- CONTACT -->
+
 ## Contact
 
 Bryan Kang - kang0121@e.ntu.edu.sg
@@ -206,8 +198,6 @@ Bryan Kang - kang0121@e.ntu.edu.sg
 Project Link: [https://github.com/kjh-bryan/taxi4hire](https://github.com/kjh-bryan/taxi4hire)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- ACKNOWLEDGMENTS -->
 <!--
@@ -223,6 +213,7 @@ Project Link: [https://github.com/kjh-bryan/taxi4hire](https://github.com/kjh-br
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
 [contributors-url]: https://github.com/github_username/repo_name/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
@@ -236,21 +227,21 @@ Project Link: [https://github.com/kjh-bryan/taxi4hire](https://github.com/kjh-br
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: screenimages/splash_screen.png
-[Flutter.dev]: https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white
-[Flutter-url]: https://flutter.dev/
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[flutter.dev]: https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white
+[flutter-url]: https://flutter.dev/
+[next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
+[next-url]: https://nextjs.org/
+[react.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[react-url]: https://reactjs.org/
+[vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[vue-url]: https://vuejs.org/
+[angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
+[angular-url]: https://angular.io/
+[svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
+[svelte-url]: https://svelte.dev/
+[laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
+[laravel-url]: https://laravel.com
+[bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
+[bootstrap-url]: https://getbootstrap.com
+[jquery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
+[jquery-url]: https://jquery.com
