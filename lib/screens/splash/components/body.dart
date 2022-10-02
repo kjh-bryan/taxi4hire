@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:taxi4hire/animation/FadeAnimation.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
@@ -37,16 +38,19 @@ class _BodyState extends State<Body> {
           children: <Widget>[
             Expanded(
               flex: 3,
-              child: PageView.builder(
-                onPageChanged: (value) {
-                  setState(() {
-                    currentPage = value;
-                  });
-                },
-                itemCount: splashData.length,
-                itemBuilder: (context, index) => SplashContent(
-                    text: splashData[index]["text"]!,
-                    image: splashData[index]["image"]!),
+              child: FadeAnimation(
+                1.5,
+                PageView.builder(
+                  onPageChanged: (value) {
+                    setState(() {
+                      currentPage = value;
+                    });
+                  },
+                  itemCount: splashData.length,
+                  itemBuilder: (context, index) => SplashContent(
+                      text: splashData[index]["text"]!,
+                      image: splashData[index]["image"]!),
+                ),
               ),
             ),
             Expanded(
@@ -58,19 +62,25 @@ class _BodyState extends State<Body> {
                 child: Column(
                   children: <Widget>[
                     Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        splashData.length,
-                        (index) => buildDot(index),
+                    FadeAnimation(
+                      1.5,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          splashData.length,
+                          (index) => buildDot(index),
+                        ),
                       ),
                     ),
                     Spacer(flex: 3),
-                    DefaultButton(
-                      text: "Get Started",
-                      press: () {
-                        Navigator.pushNamed(context, SignInScreen.routeName);
-                      },
+                    FadeAnimation(
+                      1.8,
+                      DefaultButton(
+                        text: "Get Started",
+                        press: () {
+                          Navigator.pushNamed(context, SignInScreen.routeName);
+                        },
+                      ),
                     ),
                     Spacer(),
                   ],
@@ -111,12 +121,15 @@ class SplashContent extends StatelessWidget {
     return Column(
       children: <Widget>[
         Spacer(),
-        Text(
-          "TAXI 4 HIRE",
-          style: TextStyle(
-            fontSize: getProportionateScreenWidth(36),
-            color: kPrimaryColor,
-            fontWeight: FontWeight.w400,
+        FadeAnimation(
+          1.3,
+          Text(
+            "TAXI 4 HIRE",
+            style: TextStyle(
+              fontSize: getProportionateScreenWidth(36),
+              color: kPrimaryColor,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ),
         Text(

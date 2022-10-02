@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taxi4hire/animation/FadeAnimation.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/components/form_error.dart';
 import 'package:taxi4hire/components/no_account_text.dart';
@@ -23,21 +24,30 @@ class Body extends StatelessWidget {
               SizedBox(
                 height: SizeConfig.screenHeight! * 0.08,
               ),
-              Text(
-                "Forget Password",
-                style: TextStyle(
-                    fontSize: getProportionateScreenWidth(28),
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300),
+              FadeAnimation(
+                0.8,
+                Text(
+                  "Forget Password",
+                  style: TextStyle(
+                      fontSize: getProportionateScreenWidth(28),
+                      color: Colors.black,
+                      fontWeight: FontWeight.w300),
+                ),
               ),
-              const Text(
-                "Please enter your email and we will send \nyou a link to reset your account",
-                textAlign: TextAlign.center,
+              FadeAnimation(
+                1,
+                Text(
+                  "Please enter your email and we will send \nyou a link to reset your account",
+                  textAlign: TextAlign.center,
+                ),
               ),
               SizedBox(
                 height: SizeConfig.screenHeight! * 0.12,
               ),
-              ForgetPasswordForm(),
+              FadeAnimation(
+                1.2,
+                ForgetPasswordForm(),
+              ),
             ],
           ),
         ),

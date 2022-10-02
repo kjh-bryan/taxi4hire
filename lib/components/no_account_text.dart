@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taxi4hire/constants.dart';
-import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
+import 'package:taxi4hire/screens/sign_up_selection/sign_up_selection.dart';
 import 'package:taxi4hire/size_config.dart';
 
 class NoAccountText extends StatelessWidget {
@@ -20,7 +20,9 @@ class NoAccountText extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            Navigator.pushNamed(context, SignUpSelectionScreen.routeName);
+          },
           child: Text(
             "Sign Up",
             style: TextStyle(

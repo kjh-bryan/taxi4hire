@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taxi4hire/animation/FadeAnimation.dart';
 import 'package:taxi4hire/components/no_account_text.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
@@ -20,30 +21,45 @@ class Body extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                Image.asset(
-                  "assets/images/app-logo.png",
-                  width: getProportionateScreenWidth(100),
-                ),
-                Text(
-                  "TAXI4HIRE",
-                  style: TextStyle(
-                    color: kPrimaryColor,
-                    fontSize: getProportionateScreenWidth(24),
-                    fontWeight: FontWeight.w300,
+                FadeAnimation(
+                  0.8,
+                  Image.asset(
+                    "assets/images/app-logo.png",
+                    width: getProportionateScreenWidth(100),
                   ),
                 ),
-                const Text(
-                  "Sign in with your username and password",
-                  textAlign: TextAlign.center,
+                FadeAnimation(
+                  1,
+                  Text(
+                    "TAXI4HIRE",
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: getProportionateScreenWidth(24),
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                ),
+                FadeAnimation(
+                  1.2,
+                  const Text(
+                    "Sign in with your username and password",
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 SizedBox(
                   height: SizeConfig.screenHeight! * 0.08,
                 ),
-                const SignForm(),
+                FadeAnimation(
+                  1.4,
+                  SignForm(),
+                ),
                 SizedBox(
                   height: SizeConfig.screenHeight! * 0.06,
                 ),
-                NoAccountText()
+                FadeAnimation(
+                  1.6,
+                  NoAccountText(),
+                ),
               ],
             ),
           ),

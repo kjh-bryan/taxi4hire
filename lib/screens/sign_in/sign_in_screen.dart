@@ -11,10 +11,7 @@ class SignInScreen extends StatelessWidget {
       body: Body(),
       appBar: AppBar(
         centerTitle: true,
-        leading: IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.arrow_back_ios_new_rounded),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           "Sign In",
           style: Theme.of(context).appBarTheme.titleTextStyle,
