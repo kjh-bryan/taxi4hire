@@ -47,14 +47,14 @@ class Body extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  height: SizeConfig.screenHeight! * 0.08,
+                  height: SizeConfig.screenHeight! * 0.04,
                 ),
                 FadeAnimation(
                   1.4,
                   SignForm(),
                 ),
                 SizedBox(
-                  height: SizeConfig.screenHeight! * 0.06,
+                  height: SizeConfig.screenHeight! * 0.04,
                 ),
                 FadeAnimation(
                   1.6,

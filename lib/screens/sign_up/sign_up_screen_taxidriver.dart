@@ -9,7 +9,7 @@ class SignUpTaxiDriverScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Sign Up as Taxi Driver"),
+        title: Text("Sign Up"),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context, false);

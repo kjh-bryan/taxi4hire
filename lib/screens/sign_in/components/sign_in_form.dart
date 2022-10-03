@@ -15,7 +15,7 @@ class SignForm extends StatefulWidget {
 
 class _SignFormState extends State<SignForm> {
   final _formKey = GlobalKey<FormState>();
-  late String username;
+  late String email;
   late String password;
   bool remember = false;
   final List<String> errors = [];
@@ -26,17 +26,17 @@ class _SignFormState extends State<SignForm> {
       key: _formKey,
       child: Column(
         children: [
-          buildUsernameFormField(),
+          buildEmailFormField(),
           SizedBox(
-            height: getProportionateScreenHeight(30),
+            height: getProportionateScreenHeight(20),
           ),
           buildPasswordFormField(),
           SizedBox(
-            height: getProportionateScreenHeight(10),
+            height: getProportionateScreenHeight(5),
           ),
           FormError(errors: errors),
           SizedBox(
-            height: getProportionateScreenHeight(10),
+            height: getProportionateScreenHeight(5),
           ),
           Row(
             children: [
@@ -97,10 +97,12 @@ class _SignFormState extends State<SignForm> {
           setState(() {
             errors.add(kPasswordNullError);
           });
+          return "";
         } else if (value.length < 8 && !errors.contains(kShortPasswordError)) {
           setState(() {
             errors.add(kShortPasswordError);
           });
+          return "";
         }
         return null;
       },
@@ -118,22 +120,34 @@ class _SignFormState extends State<SignForm> {
     );
   }
 
-  TextFormField buildUsernameFormField() {
+  TextFormField buildEmailFormField() {
     return TextFormField(
-      keyboardType: TextInputType.name,
-      onSaved: (newValue) => username = newValue!,
+      keyboardType: TextInputType.emailAddress,
+      onSaved: (newValue) => email = newValue!,
       onChanged: (value) {
-        if (value.isNotEmpty && errors.contains(kUsernameNullError)) {
+        if (value.isNotEmpty && errors.contains(kEmailNullError)) {
           setState(() {
-            errors.remove(kUsernameNullError);
+            errors.remove(kEmailNullError);
+          });
+        } else if (emailValidatorRegExp.hasMatch(value) &&
+            errors.contains(kInvalidEmailError)) {
+          setState(() {
+            errors.remove(kInvalidEmailError);
           });
         }
       },
       validator: (value) {
-        if (value!.isEmpty && !errors.contains(kUsernameNullError)) {
+        if (value!.isEmpty && !errors.contains(kEmailNullError)) {
           setState(() {
-            errors.add(kUsernameNullError);
+            errors.add(kEmailNullError);
           });
+          return "";
+        } else if (!emailValidatorRegExp.hasMatch(value) &&
+            !errors.contains(kInvalidEmailError)) {
+          setState(() {
+            errors.add(kInvalidEmailError);
+          });
+          return "";
         }
         return null;
       },
@@ -141,11 +155,11 @@ class _SignFormState extends State<SignForm> {
         floatingLabelStyle: TextStyle(
           color: kPrimaryColor,
         ),
-        hintText: "Enter your username",
-        labelText: "Username",
+        hintText: "Enter your email",
+        labelText: "Email",
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSuffixIcon(
-          suffixIcon: Icon(Icons.person, color: kPrimaryColor),
+          suffixIcon: Icon(Icons.mail_rounded, color: kPrimaryColor),
         ),
       ),
     );

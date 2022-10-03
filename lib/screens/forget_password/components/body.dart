@@ -42,7 +42,7 @@ class Body extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: SizeConfig.screenHeight! * 0.12,
+                height: SizeConfig.screenHeight! * 0.06,
               ),
               FadeAnimation(
                 1.2,
@@ -88,17 +88,20 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
                   errors.remove(kInvalidEmailError);
                 });
               }
+              return null;
             },
             validator: (value) {
               if (value!.isEmpty && !errors.contains(kEmailNullError)) {
                 setState(() {
                   errors.add(kEmailNullError);
                 });
+                return "";
               } else if (!emailValidatorRegExp.hasMatch(value) &&
                   !errors.contains(kInvalidEmailError)) {
                 setState(() {
                   errors.add(kInvalidEmailError);
                 });
+                return "";
               }
               return null;
             },
@@ -115,7 +118,7 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
             ),
           ),
           SizedBox(
-            height: getProportionateScreenHeight(30),
+            height: getProportionateScreenHeight(5),
           ),
           FormError(errors: errors),
           SizedBox(
@@ -130,7 +133,7 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
             },
           ),
           SizedBox(
-            height: SizeConfig.screenHeight! * 0.15,
+            height: SizeConfig.screenHeight! * 0.10,
           ),
           NoAccountText(),
         ],

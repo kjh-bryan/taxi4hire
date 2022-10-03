@@ -132,15 +132,21 @@ class SplashContent extends StatelessWidget {
             ),
           ),
         ),
-        Text(
-          text,
-          style: TextStyle(fontWeight: FontWeight.w500),
+        FadeAnimation(
+          1.5,
+          Text(
+            text,
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
         ),
         Spacer(),
-        Image.asset(
-          image,
-          height: getProportionateScreenHeight(250),
-          width: getProportionateScreenWidth(350),
+        FadeAnimation(
+          1.7,
+          Image.asset(
+            image,
+            height: getProportionateScreenHeight(250),
+            width: getProportionateScreenWidth(350),
+          ),
         ),
       ],
     );
