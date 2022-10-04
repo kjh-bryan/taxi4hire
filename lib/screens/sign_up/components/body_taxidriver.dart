@@ -1,9 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:taxi4hire/animation/FadeAnimation.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/components/form_error.dart';
+import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/global/global.dart';
+import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'package:taxi4hire/size_config.dart';
 
 class Body extends StatelessWidget {
@@ -59,11 +66,77 @@ class SignUpTaxiDriverForm extends StatefulWidget {
 
 class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
   final _formKey = GlobalKey<FormState>();
-  String? email;
+  late String email;
   String? password;
   String? confirm_password;
-  String? mobile_no;
-  String? license_no;
+  late String mobile_no;
+  late String license_no;
+
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final mobileNoController = TextEditingController();
+  final licenseNoController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    mobileNoController.dispose();
+    licenseNoController.dispose();
+    super.dispose();
+  }
+
+  saveUserInfo() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext c) {
+          return ProgressDialog(message: "Signing up.. Please wait..");
+        });
+
+    final User firebaseUser;
+    try {
+      final UserCredential userCredential =
+          await firebaseAuth.createUserWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController.text.trim());
+      firebaseUser = userCredential.user!;
+
+      if (firebaseUser != null) {
+        Map userMap = {
+          "id": firebaseUser.uid,
+          "email": emailController.text.trim(),
+          "mobile": mobileNoController.text.trim(),
+          "license_plate": licenseNoController.text.trim(),
+          "role": 0
+          //role : 0 as taxi driver
+        };
+
+        DatabaseReference taxiDriversRef =
+            FirebaseDatabase.instance.ref().child('users');
+
+        taxiDriversRef.child(firebaseUser.uid).set(userMap);
+
+        currentFirebaseUser = firebaseUser;
+
+        Fluttertoast.showToast(msg: "Registration successful, Redirecting..");
+
+        Navigator.popAndPushNamed(context, SignInScreen.routeName);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        Fluttertoast.showToast(msg: "The password provided is too weak.");
+      } else if (e.code == 'email-already-in-use') {
+        Fluttertoast.showToast(
+            msg: "The account already exists for that email.");
+      }
+      Navigator.pop(context);
+    } catch (e) {
+      print(e);
+      Navigator.pop(context);
+    }
+  }
+
   final List<String> errors = [];
   @override
   Widget build(BuildContext context) {
@@ -100,6 +173,7 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
             press: () {
               if (_formKey.currentState!.validate()) {
                 // Go to Login Page
+                saveUserInfo();
               }
             },
           ),
@@ -110,6 +184,7 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
 
   TextFormField buildLicensePlateForm() {
     return TextFormField(
+      controller: licenseNoController,
       onSaved: (newValue) => license_no = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty && errors.contains(kLicenseNoNullError)) {
@@ -145,6 +220,7 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
   TextFormField buildMobileNoFormField() {
     return TextFormField(
       keyboardType: TextInputType.phone,
+      controller: mobileNoController,
       onSaved: (newValue) => mobile_no = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty && errors.contains(kMobileNoNullError)) {
@@ -192,7 +268,7 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
   TextFormField buildConfirmPasswordFormField() {
     return TextFormField(
       obscureText: true,
-      onSaved: (newValue) => confirm_password = newValue,
+      onSaved: (newValue) => confirm_password = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty && errors.contains(kPasswordNullError)) {
           setState(() {
@@ -240,7 +316,8 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
   TextFormField buildPasswordFormField() {
     return TextFormField(
       obscureText: true,
-      onSaved: (newValue) => password = newValue,
+      controller: passwordController,
+      onSaved: (newValue) => password = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty && errors.contains(kPasswordNullError)) {
           setState(() {
@@ -290,6 +367,7 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
 
   TextFormField buildEmailFormField() {
     return TextFormField(
+      controller: emailController,
       keyboardType: TextInputType.emailAddress,
       onSaved: (newValue) => email = newValue!,
       onChanged: (value) {

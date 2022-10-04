@@ -1,10 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/components/form_error.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
+import 'package:taxi4hire/screens/main_map_view/main_map_view.dart';
 import 'package:taxi4hire/size_config.dart';
 
 class SignForm extends StatefulWidget {
@@ -20,6 +24,52 @@ class _SignFormState extends State<SignForm> {
   late String password;
   bool remember = false;
   final List<String> errors = [];
+
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  loginUser() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext c) {
+          return ProgressDialog(message: "Logging in.. Please wait..");
+        });
+
+    final User firebaseUser;
+    try {
+      final UserCredential userCredential =
+          await firebaseAuth.signInWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController.text.trim());
+      firebaseUser = userCredential.user!;
+
+      if (firebaseUser != null) {
+        if (remember) currentFirebaseUser = firebaseUser;
+
+        Fluttertoast.showToast(msg: "Logged in successful, Redirecting..");
+
+        Navigator.popAndPushNamed(context, MainMapView.routeName);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        Fluttertoast.showToast(msg: "No user found for that email");
+      } else if (e.code == 'wrong-password') {
+        Fluttertoast.showToast(msg: "Wrong password provided for that user.");
+      }
+      Navigator.pop(context);
+    } catch (e) {
+      print(e);
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +120,7 @@ class _SignFormState extends State<SignForm> {
             press: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext c) {
-                      return ProgressDialog(message: "Logging in..");
-                    });
+                loginUser();
               }
             },
           ),
@@ -87,6 +132,7 @@ class _SignFormState extends State<SignForm> {
   TextFormField buildPasswordFormField() {
     return TextFormField(
       obscureText: true,
+      controller: passwordController,
       onSaved: (newValue) => password = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty && errors.contains(kPasswordNullError)) {
@@ -130,6 +176,7 @@ class _SignFormState extends State<SignForm> {
 
   TextFormField buildEmailFormField() {
     return TextFormField(
+      controller: emailController,
       keyboardType: TextInputType.emailAddress,
       onSaved: (newValue) => email = newValue!,
       onChanged: (value) {
