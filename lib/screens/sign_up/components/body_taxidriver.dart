@@ -34,7 +34,7 @@ class Body extends StatelessWidget {
                   style: TextStyle(
                     fontSize: getProportionateScreenWidth(12),
                     color: Colors.grey.shade500,
-                    fontWeight: FontWeight.w100,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),

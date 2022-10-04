@@ -34,13 +34,13 @@ class Body extends StatelessWidget {
                   style: TextStyle(
                     fontSize: getProportionateScreenWidth(12),
                     color: Colors.grey.shade500,
-                    fontWeight: FontWeight.w100,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
               FadeAnimation(
                 1.2,
-                SignUpTaxiDriverForm(),
+                SignUpCustomerForm(),
               ),
             ],
           ),
@@ -50,14 +50,14 @@ class Body extends StatelessWidget {
   }
 }
 
-class SignUpTaxiDriverForm extends StatefulWidget {
-  const SignUpTaxiDriverForm({Key? key}) : super(key: key);
+class SignUpCustomerForm extends StatefulWidget {
+  const SignUpCustomerForm({Key? key}) : super(key: key);
 
   @override
-  State<SignUpTaxiDriverForm> createState() => _SignUpTaxiDriverFormState();
+  State<SignUpCustomerForm> createState() => _SignUpCustomerFormState();
 }
 
-class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
+class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
@@ -90,7 +90,6 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
           SizedBox(
             height: getProportionateScreenHeight(20),
           ),
-          buildLicensePlateForm(),
           FormError(errors: errors),
           SizedBox(
             height: getProportionateScreenHeight(30),
@@ -104,40 +103,6 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
             },
           ),
         ],
-      ),
-    );
-  }
-
-  TextFormField buildLicensePlateForm() {
-    return TextFormField(
-      onSaved: (newValue) => license_no = newValue!,
-      onChanged: (value) {
-        if (value.isNotEmpty && errors.contains(kLicenseNoNullError)) {
-          setState(() {
-            errors.remove(kLicenseNoNullError);
-          });
-        }
-      },
-      validator: (value) {
-        if (value!.isEmpty && !errors.contains(kLicenseNoNullError)) {
-          setState(() {
-            errors.add(kLicenseNoNullError);
-          });
-          return "";
-        }
-        return null;
-      },
-      decoration: const InputDecoration(
-        hintText: "Enter your license plate",
-        labelText: "License Plate No",
-        errorStyle: TextStyle(height: 0),
-        floatingLabelStyle: TextStyle(
-          color: kPrimaryColor,
-        ),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: CustomSuffixIcon(
-          suffixIcon: Icon(Icons.directions_car, color: kPrimaryColor),
-        ),
       ),
     );
   }
