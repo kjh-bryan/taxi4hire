@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/components/form_error.dart';
+import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
@@ -69,6 +70,12 @@ class _SignFormState extends State<SignForm> {
             press: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
+                showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext c) {
+                      return ProgressDialog(message: "Logging in..");
+                    });
               }
             },
           ),
@@ -109,6 +116,7 @@ class _SignFormState extends State<SignForm> {
       decoration: const InputDecoration(
         hintText: "Enter your password",
         labelText: "Password",
+        errorStyle: TextStyle(height: 0),
         floatingLabelStyle: TextStyle(
           color: kPrimaryColor,
         ),
@@ -157,6 +165,7 @@ class _SignFormState extends State<SignForm> {
         ),
         hintText: "Enter your email",
         labelText: "Email",
+        errorStyle: TextStyle(height: 0),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSuffixIcon(
           suffixIcon: Icon(Icons.mail_rounded, color: kPrimaryColor),
