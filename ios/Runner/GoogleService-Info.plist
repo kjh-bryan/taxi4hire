@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>20846053862-58b6q4cblo7hcu7h20m5qsavk0vb50ub.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.20846053862-58b6q4cblo7hcu7h20m5qsavk0vb50ub</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCL2OPLSWGYpl0rypiwXWbVYVqzucFCj4Q</string>
+	<key>GCM_SENDER_ID</key>
+	<string>20846053862</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.taxi4hire</string>
+	<key>PROJECT_ID</key>
+	<string>taxi-4-hire</string>
+	<key>STORAGE_BUCKET</key>
+	<string>taxi-4-hire.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:20846053862:ios:8448c0ee4d6a5752d5ee27</string>
+</dict>
+</plist>

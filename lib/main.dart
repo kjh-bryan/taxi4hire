@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:taxi4hire/constants.dart';
@@ -7,6 +8,9 @@ import 'package:taxi4hire/screens/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+
   runApp(
     MyApp(
       child: MaterialApp(

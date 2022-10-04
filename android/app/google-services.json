@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "20846053862",
+    "project_id": "taxi-4-hire",
+    "storage_bucket": "taxi-4-hire.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20846053862:android:e1ff68f7087750e9d5ee27",
+        "android_client_info": {
+          "package_name": "com.t4.taxi4hire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "20846053862-u651ob4e5j5euk0vv5veiivnc5vblmge.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvhw3ufCXLPwfR8kt_VQ41vWPEvUMyKfs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "20846053862-u651ob4e5j5euk0vv5veiivnc5vblmge.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
