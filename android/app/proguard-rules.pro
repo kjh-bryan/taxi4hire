@@ -1,0 +1,1 @@
+-keep class com.t4.taxi4hire.BuildConfig { *; }

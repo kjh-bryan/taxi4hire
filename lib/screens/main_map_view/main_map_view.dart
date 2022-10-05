@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taxi4hire/global/global.dart';
+import 'package:taxi4hire/screens/main_map_view/components/body.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 
 class MainMapView extends StatefulWidget {
@@ -13,6 +14,10 @@ class MainMapView extends StatefulWidget {
 class _MainMapViewState extends State<MainMapView> {
   @override
   Widget build(BuildContext context) {
+    // return Scaffold(
+    //   body:
+    //   Body(),
+    // );
     return Center(
       child: ElevatedButton(
         child: Text(
@@ -22,7 +27,8 @@ class _MainMapViewState extends State<MainMapView> {
           ),
         ),
         onPressed: () {
-          firebaseAuth.signOut();
+          var f = firebaseAuth.signOut();
+          print(f);
           currentFirebaseUser = null;
           Navigator.popAndPushNamed(context, SignInScreen.routeName);
         },
