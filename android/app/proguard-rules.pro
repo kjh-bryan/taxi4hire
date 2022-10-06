@@ -1,1 +1,1 @@
--keep class com.t4.taxi4hire.BuildConfig { *; }
+-keep class com.example.taxi4hire.BuildConfig { *; }

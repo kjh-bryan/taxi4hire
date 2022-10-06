@@ -14,25 +14,24 @@ class MainMapView extends StatefulWidget {
 class _MainMapViewState extends State<MainMapView> {
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   body:
-    //   Body(),
-    // );
-    return Center(
-      child: ElevatedButton(
-        child: Text(
-          "Sign Out",
-          style: TextStyle(
-            color: Colors.black,
-          ),
-        ),
-        onPressed: () {
-          var f = firebaseAuth.signOut();
-          print(f);
-          currentFirebaseUser = null;
-          Navigator.popAndPushNamed(context, SignInScreen.routeName);
-        },
-      ),
+    return Scaffold(
+      body: Body(),
     );
+    // return Center(
+    //   child: ElevatedButton(
+    //     child: Text(
+    //       "Sign Out",
+    //       style: TextStyle(
+    //         color: Colors.black,
+    //       ),
+    //     ),
+    //     onPressed: () {
+    //       var f = firebaseAuth.signOut();
+    //       print(f);
+    //       currentFirebaseUser = null;
+    //       Navigator.popAndPushNamed(context, SignInScreen.routeName);
+    //     },
+    //   ),
+    // );
   }
 }

@@ -130,6 +130,7 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
         Fluttertoast.showToast(
             msg: "The account already exists for that email.");
       }
+      print(e);
       Navigator.pop(context);
     } catch (e) {
       print(e);

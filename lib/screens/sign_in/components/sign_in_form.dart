@@ -36,6 +36,7 @@ class _SignFormState extends State<SignForm> {
   }
 
   loginUser() async {
+    print("Login User -> Show Dialog");
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -44,7 +45,10 @@ class _SignFormState extends State<SignForm> {
         });
 
     final User firebaseUser;
+
+    print("Login User -> try");
     try {
+      print("Login User -> await firebaseAuth");
       final UserCredential userCredential =
           await firebaseAuth.signInWithEmailAndPassword(
               email: emailController.text.trim(),
@@ -63,7 +67,11 @@ class _SignFormState extends State<SignForm> {
         Fluttertoast.showToast(msg: "No user found for that email");
       } else if (e.code == 'wrong-password') {
         Fluttertoast.showToast(msg: "Wrong password provided for that user.");
+      } else if (e.code == 'network-request-failed') {
+        Fluttertoast.showToast(msg: "Internet currently unavailable.");
       }
+
+      print(e);
       Navigator.pop(context);
     } catch (e) {
       print(e);

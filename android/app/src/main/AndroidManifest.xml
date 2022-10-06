@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.t4.taxi4hire">
+    package="com.example.taxi4hire">
    <application
         android:label="taxi4hire"
         android:name="${applicationName}"
@@ -32,6 +32,6 @@
             android:value="2" />
 
          <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="@string/GOOGLE_MAPS_API_KEY"/>
+               android:value="@string/MAP_API_KEY"/>
     </application>
 </manifest>

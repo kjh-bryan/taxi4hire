@@ -25,6 +25,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply from: project(':flutter_config').projectDir.getPath() + "/dotenv.gradle"
 
 android {
     compileSdkVersion flutter.compileSdkVersion
@@ -44,13 +45,14 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.t4.taxi4hire"
+        applicationId "com.example.taxi4hire"
         //minSdkVersion flutter.minSdkVersion
         minSdkVersion 23
         targetSdkVersion 30
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        resValue "string", "build_config_package", "com.example.taxi4hire"
     }
 
     buildTypes {
