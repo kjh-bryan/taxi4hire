@@ -1,8 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:taxi4hire/animation/FadeAnimation.dart';
+import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/default_button.dart';
+import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/map_controller.dart';
+import 'package:taxi4hire/controller/user_controller.dart';
+import 'package:taxi4hire/global/global.dart';
+import 'package:taxi4hire/models/user_model.dart';
+import 'package:taxi4hire/screens/main_map/main_map.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'package:taxi4hire/size_config.dart';
 
@@ -29,6 +39,16 @@ class _BodyState extends State<Body> {
       "image": "assets/images/nearby_taxi_nobg.png"
     },
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      signInExistingUser(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -78,7 +98,19 @@ class _BodyState extends State<Body> {
                       DefaultButton(
                         text: "Get Started",
                         press: () {
-                          Navigator.pushNamed(context, SignInScreen.routeName);
+                          Navigator.popAndPushNamed(
+                              context, SignInScreen.routeName);
+                          // Timer(Duration(seconds: 3), () async {
+                          //   if (await firebaseAuth.currentUser != null) {
+                          //     currentFirebaseUser = firebaseAuth.currentUser;
+                          //     // Navigator.popAndPushNamed(context, MainMapView.routeName);
+                          //     Navigator.popAndPushNamed(
+                          //         context, MainMap.routeName);
+                          //   } else {
+                          //     Navigator.popAndPushNamed(
+                          //         context, SignInScreen.routeName);
+                          //   }
+                          // });
                         },
                       ),
                     ),

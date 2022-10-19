@@ -3,9 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/routes.dart';
-import 'package:taxi4hire/screens/main_map_view/main_map_view.dart';
 import 'package:taxi4hire/screens/splash/splash_screen.dart';
 import 'package:taxi4hire/screens/theme.dart';
 
@@ -16,14 +18,17 @@ void main() async {
   await FlutterConfig.loadEnvVariables();
   runApp(
     MyApp(
-      child: MaterialApp(
-        title: 'Taxi 4 Hire',
-        theme: theme(),
-        //home: const SplashScreen(),
-        initialRoute: SplashScreen.routeName,
-        // initialRoute: MainMapView.routeName,
-        routes: routes,
-        debugShowCheckedModeBanner: false,
+      child: ChangeNotifierProvider(
+        create: (context) => AppInfo(),
+        child: MaterialApp(
+          title: 'Taxi 4 Hire',
+          theme: theme(),
+          //home: const SplashScreen(),
+          initialRoute: SplashScreen.routeName,
+          // initialRoute: MainMapView.routeName,
+          routes: routes,
+          debugShowCheckedModeBanner: false,
+        ),
       ),
     ),
   );

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:taxi4hire/animation/FadeAnimation.dart';
 import 'package:taxi4hire/components/default_button.dart';
-import 'package:taxi4hire/components/no_account_text.dart';
 import 'package:taxi4hire/constants.dart';
-import 'package:taxi4hire/models/service.dart';
-import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
-import 'package:taxi4hire/screens/sign_in/components/sign_in_form.dart';
+import 'package:taxi4hire/models/service_options.dart';
 import 'package:taxi4hire/screens/sign_up/sign_up_screen_customer.dart';
 import 'package:taxi4hire/screens/sign_up/sign_up_screen_taxidriver.dart';
 import 'package:taxi4hire/size_config.dart';
@@ -17,10 +14,11 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  List<Service> services = [
-    Service(
+  List<ServiceOption> services = [
+    ServiceOption(
         'Taxi Driver', 'assets/images/taxi_driver_flat_button_transparent.png'),
-    Service('Customer', 'assets/images/customer_flat_button_transparent.png'),
+    ServiceOption(
+        'Customer', 'assets/images/customer_flat_button_transparent.png'),
   ];
 
   int selectedService = 0;
@@ -102,10 +100,7 @@ class _BodyState extends State<Body> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          if (selectedService == index)
-            selectedService = -1;
-          else
-            selectedService = index;
+          if (selectedService != index) selectedService = index;
         });
       },
       child: AnimatedContainer(

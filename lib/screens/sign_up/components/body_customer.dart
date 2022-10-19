@@ -8,6 +8,7 @@ import 'package:taxi4hire/components/form_error.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/user_controller.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'package:taxi4hire/size_config.dart';
@@ -83,67 +84,6 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
     super.dispose();
   }
 
-  saveUserInfo() async {
-    print("Test 1");
-
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext c) {
-          return ProgressDialog(message: "Signing up.. Please wait..");
-        });
-
-    print("Test 2");
-    final User firebaseUser;
-    try {
-      print("Test 4");
-      final UserCredential userCredential =
-          await firebaseAuth.createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim());
-
-      firebaseUser = userCredential.user!;
-
-      if (firebaseUser != null) {
-        print("Test 5");
-        Map userMap = {
-          "id": firebaseUser.uid,
-          "email": emailController.text.trim(),
-          "mobile": mobileNoController.text.trim(),
-          "license_plate": "",
-          "role": 1
-          //role : 1 as passenger
-        };
-
-        DatabaseReference taxiDriversRef =
-            FirebaseDatabase.instance.ref().child('users');
-
-        taxiDriversRef.child(firebaseUser.uid).set(userMap);
-
-        currentFirebaseUser = firebaseUser;
-
-        Fluttertoast.showToast(msg: "Registration successful, Redirecting..");
-
-        Navigator.popAndPushNamed(context, SignInScreen.routeName);
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        Fluttertoast.showToast(msg: "The password provided is too weak.");
-      } else if (e.code == 'email-already-in-use') {
-        Fluttertoast.showToast(
-            msg: "The account already exists for that email.");
-      }
-      print("Inside FirebaseAuthException catch (e) " + e.toString());
-      Navigator.pop(context);
-    } catch (e) {
-      print("Test 8");
-      print(e);
-      Navigator.pop(context);
-    }
-
-    print("Test 3");
-  }
-
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -177,7 +117,8 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
             text: "Sign Up",
             press: () {
               if (_formKey.currentState!.validate()) {
-                saveUserInfo();
+                signUpUser(context, emailController, passwordController,
+                    mobileNoController, null, 1);
                 // Go to Login Page
               }
             },

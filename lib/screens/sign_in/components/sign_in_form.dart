@@ -1,14 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/components/form_error.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/user_controller.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
-import 'package:taxi4hire/screens/main_map_view/main_map_view.dart';
+import 'package:taxi4hire/screens/main_map/main_map.dart';
+import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'package:taxi4hire/size_config.dart';
 
 class SignForm extends StatefulWidget {
@@ -23,6 +28,7 @@ class _SignFormState extends State<SignForm> {
   late String email;
   late String password;
   bool remember = false;
+  LocationPermission? _locationPermission;
   final List<String> errors = [];
 
   final emailController = TextEditingController();
@@ -35,48 +41,28 @@ class _SignFormState extends State<SignForm> {
     super.dispose();
   }
 
-  loginUser() async {
-    print("Login User -> Show Dialog");
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext c) {
-          return ProgressDialog(message: "Logging in.. Please wait..");
-        });
+  checkIfLocationPermissionAllowed() async {
+    _locationPermission = await Geolocator.checkPermission();
 
-    final User firebaseUser;
-
-    print("Login User -> try");
-    try {
-      print("Login User -> await firebaseAuth");
-      final UserCredential userCredential =
-          await firebaseAuth.signInWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim());
-      firebaseUser = userCredential.user!;
-
-      if (firebaseUser != null) {
-        if (remember) currentFirebaseUser = firebaseUser;
-
-        Fluttertoast.showToast(msg: "Logged in successful, Redirecting..");
-
-        Navigator.popAndPushNamed(context, MainMapView.routeName);
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        Fluttertoast.showToast(msg: "No user found for that email");
-      } else if (e.code == 'wrong-password') {
-        Fluttertoast.showToast(msg: "Wrong password provided for that user.");
-      } else if (e.code == 'network-request-failed') {
-        Fluttertoast.showToast(msg: "Internet currently unavailable.");
-      }
-
-      print(e);
-      Navigator.pop(context);
-    } catch (e) {
-      print(e);
-      Navigator.pop(context);
+    if (_locationPermission == LocationPermission.always ||
+        _locationPermission == LocationPermission.whileInUse) {
+      return;
     }
+
+    if (_locationPermission == LocationPermission.denied) {
+      _locationPermission = await Geolocator.requestPermission();
+
+      if (_locationPermission == LocationPermission.denied) {
+        _locationPermission = await Geolocator.requestPermission();
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkIfLocationPermissionAllowed();
   }
 
   @override
@@ -97,29 +83,29 @@ class _SignFormState extends State<SignForm> {
           SizedBox(
             height: getProportionateScreenHeight(5),
           ),
-          Row(
-            children: [
-              Checkbox(
-                value: remember,
-                activeColor: kPrimaryColor,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value!;
-                  });
-                },
-              ),
-              Text("Remember me"),
-              Spacer(),
-              GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                    context, ForgetPasswordScreen.routeName),
-                child: Text(
-                  "Forget Password",
-                  style: TextStyle(decoration: TextDecoration.underline),
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     Checkbox(
+          //       value: remember,
+          //       activeColor: kPrimaryColor,
+          //       onChanged: (value) {
+          //         setState(() {
+          //           remember = value!;
+          //         });
+          //       },
+          //     ),
+          //     Text("Remember me"),
+          //     Spacer(),
+          //     GestureDetector(
+          //       onTap: () => Navigator.pushNamed(
+          //           context, ForgetPasswordScreen.routeName),
+          //       child: Text(
+          //         "Forget Password",
+          //         style: TextStyle(decoration: TextDecoration.underline),
+          //       ),
+          //     ),
+          //   ],
+          // ),
           SizedBox(
             height: getProportionateScreenHeight(10),
           ),
@@ -128,7 +114,8 @@ class _SignFormState extends State<SignForm> {
             press: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                loginUser();
+                signInUser(
+                    context, emailController, passwordController, remember);
               }
             },
           ),

@@ -9,6 +9,7 @@ import 'package:taxi4hire/components/form_error.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/user_controller.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'package:taxi4hire/size_config.dart';
@@ -86,58 +87,6 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
     super.dispose();
   }
 
-  saveUserInfo() async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext c) {
-          return ProgressDialog(message: "Signing up.. Please wait..");
-        });
-
-    final User firebaseUser;
-    try {
-      final UserCredential userCredential =
-          await firebaseAuth.createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim());
-      firebaseUser = userCredential.user!;
-
-      if (firebaseUser != null) {
-        Map userMap = {
-          "id": firebaseUser.uid,
-          "email": emailController.text.trim(),
-          "mobile": mobileNoController.text.trim(),
-          "license_plate": licenseNoController.text.trim(),
-          "role": 0
-          //role : 0 as taxi driver
-        };
-
-        DatabaseReference taxiDriversRef =
-            FirebaseDatabase.instance.ref().child('users');
-
-        taxiDriversRef.child(firebaseUser.uid).set(userMap);
-
-        currentFirebaseUser = firebaseUser;
-
-        Fluttertoast.showToast(msg: "Registration successful, Redirecting..");
-
-        Navigator.popAndPushNamed(context, SignInScreen.routeName);
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        Fluttertoast.showToast(msg: "The password provided is too weak.");
-      } else if (e.code == 'email-already-in-use') {
-        Fluttertoast.showToast(
-            msg: "The account already exists for that email.");
-      }
-      print(e);
-      Navigator.pop(context);
-    } catch (e) {
-      print(e);
-      Navigator.pop(context);
-    }
-  }
-
   final List<String> errors = [];
   @override
   Widget build(BuildContext context) {
@@ -174,7 +123,8 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
             press: () {
               if (_formKey.currentState!.validate()) {
                 // Go to Login Page
-                saveUserInfo();
+                signUpUser(context, emailController, passwordController,
+                    mobileNoController, licenseNoController, 0);
               }
             },
           ),
