@@ -14,7 +14,7 @@ import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/models/direction_details_info.dart';
 import 'package:taxi4hire/models/taxi_list.dart';
-import 'package:taxi4hire/screens/main_map/components/panel_widget.dart';
+import 'package:taxi4hire/screens/main_map/components/booking_request_panel_widget.dart';
 import 'package:taxi4hire/screens/main_map/components/search_places_screen.dart';
 import 'package:taxi4hire/screens/main_map/widget/current_location_data.dart';
 import 'package:taxi4hire/screens/main_map/widget/inherited_widget.dart';
@@ -266,7 +266,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
           ? SizeConfig.screenHeight! * 0.4
           : SizeConfig.screenHeight! * 0.06,
       panelBuilder: (controller) {
-        return PanelWidget(
+        return BookRequestPanelWidget(
           panelController: panelController,
           controller: controller,
         );

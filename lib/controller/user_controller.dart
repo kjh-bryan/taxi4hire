@@ -102,7 +102,8 @@ void signUpUser(
         "mobile": mobileNoController.text.trim(),
         "license_plate":
             licenseNoController != null ? licenseNoController.text.trim() : "",
-        "role": 1
+        "role": role,
+        "ride_request": "idle"
         //role : 1 as passenger
       };
 

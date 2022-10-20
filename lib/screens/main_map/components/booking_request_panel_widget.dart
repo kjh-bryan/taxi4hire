@@ -8,26 +8,28 @@ import 'package:taxi4hire/animation/FadeAnimation.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/controller/booking_controller.dart';
+import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/screens/main_map/widget/taxi_list_tile_widget.dart';
 import 'package:taxi4hire/size_config.dart';
 
-class PanelWidget extends StatefulWidget {
+class BookRequestPanelWidget extends StatefulWidget {
   final ScrollController controller;
   final PanelController panelController;
 
-  const PanelWidget({
+  const BookRequestPanelWidget({
     Key? key,
     required this.controller,
     required this.panelController,
   }) : super(key: key);
 
   @override
-  State<PanelWidget> createState() => _PanelWidgetState();
+  State<BookRequestPanelWidget> createState() => _BookRequestPanelWidgetState();
 }
 
-class _PanelWidgetState extends State<PanelWidget> {
+class _BookRequestPanelWidgetState extends State<BookRequestPanelWidget> {
   DatabaseReference? referenceRideRequest;
+  DatabaseReference? userReference;
   int selectedTaxi = 0;
 
   bool bookingRequest = false;
@@ -157,11 +159,26 @@ class _PanelWidgetState extends State<PanelWidget> {
                                 //saveRideRequestInformation();
                                 setState(() {
                                   bookingRequest = true;
+                                  print(
+                                      "DEBUG : panel_widget.dart > DefaultButton > bookRideRequest");
+                                  referenceRideRequest = bookRideRequest(
+                                      referenceRideRequest, context);
+
+                                  userReference = FirebaseDatabase.instance
+                                      .ref()
+                                      .child("users")
+                                      .child(currentFirebaseUser!.uid)
+                                      .child("ride_request");
+
+                                  userReference!.set("waiting");
+                                  userReference!.onValue.listen((event) {});
+
+                                  Future.delayed(Duration(seconds: 10), () {
+                                    print(
+                                        "DEBUG : booking_request_panel_widget > Future");
+                                    if (userReference != null) {}
+                                  });
                                 });
-                                print(
-                                    "DEBUG : panel_widget.dart > DefaultButton > bookRideRequest");
-                                referenceRideRequest = bookRideRequest(
-                                    referenceRideRequest, context);
                                 Provider.of<AppInfo>(context, listen: false)
                                     .updateRequestRideStatus(true);
                               } else {
@@ -265,11 +282,16 @@ class _PanelWidgetState extends State<PanelWidget> {
                               if (Provider.of<AppInfo>(context, listen: false)
                                       .userDropOffLocation !=
                                   null) {
-                                referenceRideRequest!.remove();
                                 Provider.of<AppInfo>(context, listen: false)
                                     .updateRequestRideStatus(false);
                                 setState(() {
+                                  print(
+                                      "DEBUG : booking_request_panel_widget > Cancel Click");
+                                  userReference!.set("idle");
                                   bookingRequest = false;
+                                  referenceRideRequest!.remove();
+                                  userReference!.onDisconnect();
+                                  userReference = null;
                                 });
                               } else {
                                 Fluttertoast.showToast(

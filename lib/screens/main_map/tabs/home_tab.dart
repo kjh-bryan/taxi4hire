@@ -38,72 +38,76 @@ class _HomeTabPageState extends State<HomeTabPage> {
   var geoLocator = Geolocator();
 
   Future<void> getTaxiAvailability() async {
-    markersSet.clear();
+    // markersSet.clear();
+    if (markersSet == null) {
+      BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(),
+        "assets/images/car.png",
+      );
+      print(
+          "\nDEBUG : home_tab > getTaxiAvailability > await BitmapDescriptor");
+      var url = Uri.https('api.data.gov.sg', '/v1/transport/taxi-availability');
 
-    BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(),
-      "assets/images/car.png",
-    );
-    print("\nDEBUG : home_tab > getTaxiAvailability > await BitmapDescriptor");
-    var url = Uri.https('api.data.gov.sg', '/v1/transport/taxi-availability');
+      // Await the http get response, then decode the json-formatted response.
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        var jsonResponse =
+            convert.jsonDecode(response.body) as Map<String, dynamic>;
+        List<dynamic> features =
+            jsonResponse["features"][0]["geometry"]["coordinates"];
 
-    // Await the http get response, then decode the json-formatted response.
-    var response = await http.get(url);
-    if (response.statusCode == 200) {
-      var jsonResponse =
-          convert.jsonDecode(response.body) as Map<String, dynamic>;
-      List<dynamic> features =
-          jsonResponse["features"][0]["geometry"]["coordinates"];
+        for (var i = 0; i < features.length; i++) {
+          Marker marker = Marker(
+            markerId: MarkerId("marker_id_" + i.toString()),
+            position: LatLng(
+              double.parse(features[i][1].toString()),
+              double.parse(features[i][0].toString()),
+            ),
+            infoWindow: InfoWindow(
+              title: "marker_id_" + i.toString(),
+            ),
+            icon: markerbitmap,
+          );
 
-      for (var i = 0; i < features.length; i++) {
-        Marker marker = Marker(
-          markerId: MarkerId("marker_id_" + i.toString()),
-          position: LatLng(
-            double.parse(features[i][1].toString()),
-            double.parse(features[i][0].toString()),
-          ),
-          infoWindow: InfoWindow(
-            title: "marker_id_" + i.toString(),
-          ),
-          icon: markerbitmap,
-        );
+          setState(() {
+            markersSet.add(marker);
+          });
+        }
 
-        setState(() {
-          markersSet.add(marker);
-        });
+        Provider.of<AppInfo>(context, listen: false)
+            .updateTaxiMarkerSets(markersSet);
+
+        print('\nDEBUG :Printing  Map <markers> -> ' + markersSet.toString());
+      } else {
+        print('\nDEBUG :Request failed with status: ${response.statusCode}.');
       }
 
-      Provider.of<AppInfo>(context, listen: false)
-          .updateTaxiMarkerSets(markersSet);
+      // Marker firstMarker = Marker(
+      //   markerId: MarkerId("source"),
+      //   position: LatLng(sourceLocation.latitude, sourceLocation.longitude),
+      //   infoWindow: InfoWindow(
+      //     title: "Source Location",
+      //   ),
+      //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      // );
 
-      print('\nDEBUG :Printing  Map <markers> -> ' + markersSet.toString());
+      // Marker secondMarker = Marker(
+      //   markerId: MarkerId("destination"),
+      //   position: LatLng(destination.latitude, destination.longitude),
+      //   infoWindow: InfoWindow(
+      //     title: "Destination",
+      //   ),
+      //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      // );
+
+      // markersList.add(firstMarker);
+      // markersList.add(secondMarker);
+      print("\nDEBUG : home_tab > getTaxiAvailabilty > Print ModalRoute > " +
+          ModalRoute.of(context)!.settings.name.toString());
+      Navigator.pop(context);
     } else {
-      print('\nDEBUG :Request failed with status: ${response.statusCode}.');
+      Navigator.pop(context);
     }
-
-    // Marker firstMarker = Marker(
-    //   markerId: MarkerId("source"),
-    //   position: LatLng(sourceLocation.latitude, sourceLocation.longitude),
-    //   infoWindow: InfoWindow(
-    //     title: "Source Location",
-    //   ),
-    //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    // );
-
-    // Marker secondMarker = Marker(
-    //   markerId: MarkerId("destination"),
-    //   position: LatLng(destination.latitude, destination.longitude),
-    //   infoWindow: InfoWindow(
-    //     title: "Destination",
-    //   ),
-    //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    // );
-
-    // markersList.add(firstMarker);
-    // markersList.add(secondMarker);
-    print("\nDEBUG : home_tab > getTaxiAvailabilty > Print ModalRoute > " +
-        ModalRoute.of(context)!.settings.name.toString());
-    Navigator.pop(context);
   }
 
   locateUserPosition() async {

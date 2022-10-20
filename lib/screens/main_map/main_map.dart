@@ -5,7 +5,8 @@ import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/models/user_model.dart';
-import 'package:taxi4hire/screens/main_map/tabs/book_requests_tab.dart';
+import 'package:taxi4hire/screens/main_map/tabs/book_request_tab.dart';
+import 'package:taxi4hire/screens/main_map/tabs/booking_requests_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/home_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/profile_tab.dart';
 import 'package:taxi4hire/size_config.dart';
@@ -60,28 +61,30 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
       body: TabBarView(
         physics: NeverScrollableScrollPhysics(),
         controller: tabController,
-        children: const [
+        children: [
           HomeTabPage(),
-          BookRequestsTabPage(),
+          (userModelCurrentInfo!.role.toString() == "0")
+              ? BookingRequestsTabPage()
+              : BookRequestsTabPage(),
           ProfileTabPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: "Home",
           ),
           userModelCurrentInfo!.role.toString() == "0"
-              ? BottomNavigationBarItem(
+              ? const BottomNavigationBarItem(
                   icon: Icon(Icons.list_alt_rounded),
                   label: "Booking Requests",
                 )
-              : BottomNavigationBarItem(
+              : const BottomNavigationBarItem(
                   icon: Icon(Icons.touch_app),
                   label: "Book Request",
                 ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "Profile",
           ),
