@@ -16,7 +16,7 @@ const kTextColor = Color(0xFF757575);
 const kAnimationDuration = Duration(milliseconds: 200);
 
 final headingStyle = TextStyle(
-  fontSize: getProportionateScreenWidth(28),
+  fontSize: getProportionateScreenWidth(26),
   fontWeight: FontWeight.w300,
   color: Colors.black,
   height: 1.5,
@@ -28,8 +28,8 @@ final RegExp emailValidatorRegExp =
 
 const String kEmailNullError = "Please enter your email";
 const String kInvalidEmailError = "Please enter a valid email";
-const String kUsernameNullError = "Please enter your username";
-const String kInvalidUsernameError = "Please enter a valid username";
+const String kUsernameNullError = "Please enter your name";
+const String kInvalidUsernameError = "Please enter a valid name";
 const String kPasswordNullError = "Please enter your password";
 const String kInvalidPasswordError = "Please enter a valid password";
 

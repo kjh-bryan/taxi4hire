@@ -22,11 +22,14 @@ class Body extends StatelessWidget {
       width: double.infinity,
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: getProportionateScreenWidth(35),
+          horizontal: getProportionateScreenWidth(25),
         ),
         child: SingleChildScrollView(
           child: Column(
             children: [
+              SizedBox(
+                height: getProportionateScreenHeight(20),
+              ),
               FadeAnimation(
                 0.8,
                 Text(
@@ -67,18 +70,37 @@ class SignUpCustomerForm extends StatefulWidget {
 class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
   final _formKey = GlobalKey<FormState>();
   late String email;
+  late String name;
   String? password;
   String? confirm_password;
   late String mobile_no;
-  final List<String> errors = [];
+  final List<String?> errors = [];
 
   final emailController = TextEditingController();
+  final nameController = TextEditingController();
   final passwordController = TextEditingController();
   final mobileNoController = TextEditingController();
+
+  void addError({String? error}) {
+    if (!errors.contains(error)) {
+      setState(() {
+        errors.add(error);
+      });
+    }
+  }
+
+  void removeError({String? error}) {
+    if (errors.contains(error)) {
+      setState(() {
+        errors.remove(error);
+      });
+    }
+  }
 
   @override
   void dispose() {
     emailController.dispose();
+    nameController.dispose();
     passwordController.dispose();
     mobileNoController.dispose();
     super.dispose();
@@ -91,7 +113,7 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
       child: Column(
         children: [
           SizedBox(
-            height: getProportionateScreenHeight(20),
+            height: getProportionateScreenHeight(30),
           ),
           buildEmailFormField(),
           SizedBox(
@@ -105,20 +127,27 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
           SizedBox(
             height: getProportionateScreenHeight(20),
           ),
-          buildMobileNoFormField(),
+          buildNameFormField(),
           SizedBox(
             height: getProportionateScreenHeight(20),
           ),
+          buildMobileNoFormField(),
+          SizedBox(
+            height: getProportionateScreenHeight(10),
+          ),
           FormError(errors: errors),
           SizedBox(
-            height: getProportionateScreenHeight(30),
+            height: (errors.length == 0)
+                ? getProportionateScreenHeight(40)
+                : getProportionateScreenHeight(10),
           ),
           DefaultButton(
             text: "Sign Up",
             press: () {
               if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
                 signUpUser(context, emailController, passwordController,
-                    mobileNoController, null, 1);
+                    nameController, mobileNoController, null, 1);
                 // Go to Login Page
               }
             },
@@ -134,29 +163,19 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
       controller: mobileNoController,
       onSaved: (newValue) => mobile_no = newValue!,
       onChanged: (value) {
-        if (value.isNotEmpty && errors.contains(kMobileNoNullError)) {
-          setState(() {
-            errors.remove(kMobileNoNullError);
-          });
-        } else if (value.length == 8 &&
-            errors.contains(kInvalidMobileNoError)) {
-          setState(() {
-            errors.remove(kInvalidMobileNoError);
-          });
+        if (value.isNotEmpty) {
+          removeError(error: kMobileNoNullError);
+        } else if (value.length == 8) {
+          removeError(error: kInvalidMobileNoError);
         }
+        return null;
       },
       validator: (value) {
-        if (value!.isEmpty && !errors.contains(kMobileNoNullError)) {
-          setState(() {
-            errors.add(kMobileNoNullError);
-          });
+        if (value!.isEmpty) {
+          addError(error: kMobileNoNullError);
           return "";
-        } else if (value.length < 8 &&
-            value.length > 8 &&
-            !errors.contains(kInvalidMobileNoError)) {
-          setState(() {
-            errors.add(kInvalidMobileNoError);
-          });
+        } else if (value.length < 8 && value.length > 8) {
+          addError(error: kInvalidMobileNoError);
           return "";
         }
         return null;
@@ -181,30 +200,19 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
       obscureText: true,
       onSaved: (newValue) => confirm_password = newValue!,
       onChanged: (value) {
-        if (value.isNotEmpty && errors.contains(kPasswordNullError)) {
-          setState(() {
-            errors.remove(kPasswordNullError);
-          });
-        } else if (value.isNotEmpty &&
-            password == confirm_password &&
-            errors.contains(kMatchPasswordError)) {
-          setState(() {
-            errors.remove(kMatchPasswordError);
-          });
+        if (value.isNotEmpty) {
+          removeError(error: kConfirmPasswordNullError);
+        } else if (value.isNotEmpty && password == confirm_password) {
+          removeError(error: kMatchPasswordError);
         }
         confirm_password = value;
       },
       validator: (value) {
-        if (value!.isEmpty && !errors.contains(kPasswordNullError)) {
-          setState(() {
-            errors.add(kPasswordNullError);
-          });
+        if (value!.isEmpty) {
+          addError(error: kConfirmPasswordNullError);
           return "";
-        } else if ((password != value) &&
-            !errors.contains(kMatchPasswordError)) {
-          setState(() {
-            errors.add(kMatchPasswordError);
-          });
+        } else if ((password != value)) {
+          addError(error: kMatchPasswordError);
           return "";
         }
         return null;
@@ -228,35 +236,26 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
     return TextFormField(
       obscureText: true,
       controller: passwordController,
-      onSaved: (newValue) => password = newValue!,
+      onSaved: (newValue) => password = newValue,
       onChanged: (value) {
-        if (value.isNotEmpty && errors.contains(kPasswordNullError)) {
-          setState(() {
-            errors.remove(kPasswordNullError);
-          });
-        } else if (value.length >= 8 && errors.contains(kShortPasswordError)) {
-          setState(() {
-            errors.remove(kShortPasswordError);
-          });
-        } else if (value.isNotEmpty &&
-            password == confirm_password &&
-            errors.contains(kMatchPasswordError)) {
-          setState(() {
-            errors.remove(kMatchPasswordError);
-          });
+        if (value.isNotEmpty) {
+          removeError(error: kPasswordNullError);
+        } else if (value.length >= 8) {
+          removeError(error: kShortPasswordError);
         }
+        // else if (value.isNotEmpty &&
+        //     password == confirm_password
+        //     ) {
+        //  removeError(error:kMatchPasswordError);
+        // }
         password = value;
       },
       validator: (value) {
-        if (value!.isEmpty && !errors.contains(kPasswordNullError)) {
-          setState(() {
-            errors.add(kPasswordNullError);
-          });
+        if (value!.isEmpty) {
+          addError(error: kPasswordNullError);
           return "";
-        } else if (value.length < 8 && !errors.contains(kShortPasswordError)) {
-          setState(() {
-            errors.add(kShortPasswordError);
-          });
+        } else if (value.length < 8) {
+          addError(error: kShortPasswordError);
           return "";
         }
         return null;
@@ -276,34 +275,58 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
     );
   }
 
+  TextFormField buildNameFormField() {
+    return TextFormField(
+      controller: nameController,
+      keyboardType: TextInputType.name,
+      onSaved: (newValue) => name = newValue!,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kUsernameNullError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: kUsernameNullError);
+          return "";
+        }
+        return null;
+      },
+      decoration: const InputDecoration(
+        floatingLabelStyle: TextStyle(
+          color: kPrimaryColor,
+        ),
+        errorStyle: TextStyle(height: 0),
+        hintText: "Enter your name",
+        labelText: "Name",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSuffixIcon(
+          suffixIcon: Icon(Icons.badge, color: kPrimaryColor),
+        ),
+      ),
+    );
+  }
+
   TextFormField buildEmailFormField() {
     return TextFormField(
       keyboardType: TextInputType.emailAddress,
       onSaved: (newValue) => email = newValue!,
       controller: emailController,
       onChanged: (value) {
-        if (value.isNotEmpty && errors.contains(kEmailNullError)) {
-          setState(() {
-            errors.remove(kEmailNullError);
-          });
-        } else if (emailValidatorRegExp.hasMatch(value) &&
-            errors.contains(kInvalidEmailError)) {
-          setState(() {
-            errors.remove(kInvalidEmailError);
-          });
+        if (value.isNotEmpty) {
+          removeError(error: kEmailNullError);
+        } else if (emailValidatorRegExp.hasMatch(value)) {
+          removeError(error: kInvalidEmailError);
         }
+        return null;
       },
       validator: (value) {
-        if (value!.isEmpty && !errors.contains(kEmailNullError)) {
-          setState(() {
-            errors.add(kEmailNullError);
-          });
+        if (value!.isEmpty) {
+          addError(error: kEmailNullError);
           return "";
-        } else if (!emailValidatorRegExp.hasMatch(value) &&
-            !errors.contains(kInvalidEmailError)) {
-          setState(() {
-            errors.add(kInvalidEmailError);
-          });
+        } else if (!emailValidatorRegExp.hasMatch(value)) {
+          addError(error: kInvalidEmailError);
           return "";
         }
         return null;

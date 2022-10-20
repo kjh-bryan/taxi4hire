@@ -7,7 +7,7 @@ class FormError extends StatelessWidget {
     required this.errors,
   }) : super(key: key);
 
-  final List<String> errors;
+  final List<String?> errors;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class FormError extends StatelessWidget {
       children: List.generate(
         errors.length,
         (index) => formErrorText(
-          error: errors[index],
+          error: errors[index]!,
         ),
       ),
     );

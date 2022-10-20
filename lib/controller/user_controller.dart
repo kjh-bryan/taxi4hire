@@ -5,10 +5,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/controller/map_controller.dart';
 import 'package:taxi4hire/global/global.dart';
+import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/screens/main_map/main_map.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 
@@ -76,6 +78,7 @@ void signUpUser(
     BuildContext context,
     TextEditingController emailController,
     TextEditingController passwordController,
+    TextEditingController nameController,
     TextEditingController mobileNoController,
     TextEditingController? licenseNoController,
     int role) async {
@@ -99,6 +102,7 @@ void signUpUser(
       Map userMap = {
         "id": firebaseUser.uid,
         "email": emailController.text.trim(),
+        "name": nameController.text.trim(),
         "mobile": mobileNoController.text.trim(),
         "license_plate":
             licenseNoController != null ? licenseNoController.text.trim() : "",
@@ -158,4 +162,12 @@ signInExistingUser(
       //                       context, MainMap.routeName);
     }
   });
+}
+
+void signOutUser(BuildContext context) async {
+  userModelCurrentInfo = null;
+  currentFirebaseUser = null;
+  await firebaseAuth.signOut();
+  Provider.of<AppInfo>(context, listen: false).logOut();
+  Navigator.popAndPushNamed(context, SignInScreen.routeName);
 }

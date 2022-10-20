@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 class UserModel {
   String? id;
   String? email;
+  String? name;
   String? mobile;
   String? license_plate;
   String? role;
@@ -16,6 +17,7 @@ class UserModel {
   UserModel(
       {this.id,
       this.email,
+      this.name,
       this.mobile,
       this.license_plate,
       this.role,
@@ -25,6 +27,7 @@ class UserModel {
     id = snap.key;
     email = (snap.value as dynamic)["email"];
     mobile = (snap.value as dynamic)["mobile"];
+    name = (snap.value as dynamic)["name"];
     license_plate = (snap.value as dynamic)["license_plate"];
     role = (snap.value as dynamic)["role"].toString();
     rideStatus = (snap.value as dynamic)["ride_status"].toString();
