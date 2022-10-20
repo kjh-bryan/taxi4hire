@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/booking_controller.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/models/user_ride_request.dart';
 import 'package:taxi4hire/screens/ride_request/driver_new_ride_request.dart';
@@ -27,86 +28,6 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
 
   bool _tileExpanded = false;
   int _expandedTile = -1;
-
-  void acceptBookRequest(String userId, String rideRequestId) async {
-    print(
-        "DEBUG > booking_request_tab > accept Request > userId : $userId > rideRequestId : $rideRequestId");
-
-    DatabaseReference rideRequestDetailsReference = FirebaseDatabase.instance
-        .ref()
-        .child("ride_request")
-        .child(rideRequestId);
-
-    final rideRequestDetailsSnapshot = await rideRequestDetailsReference.get();
-
-    DatabaseReference requesterReference = FirebaseDatabase.instance
-        .ref()
-        .child("users")
-        .child(userId)
-        .child("ride_request");
-    final requestSnapshot = await requesterReference.get();
-
-    DatabaseReference driverUserReference = FirebaseDatabase.instance
-        .ref()
-        .child("users")
-        .child(userModelCurrentInfo!.id!)
-        .child("ride_request");
-    final userSnapshot = await driverUserReference.get();
-
-    DatabaseReference rideRequestDriverIdReference = FirebaseDatabase.instance
-        .ref()
-        .child("ride_request")
-        .child(rideRequestId)
-        .child("driverId");
-    final rideRequestSnapshot = await rideRequestDriverIdReference.get();
-
-    //print(
-    //    "DEBUG > booking_request_tab > acceptRequest > requestSnapShot : ${requestSnapshot.value} > userSnapShot : ${userSnapshot.value}> rideRequestSnapshot : ${rideRequestSnapshot.value}");
-
-    if (requestSnapshot.value.toString() == "waiting" &&
-        userSnapshot.value.toString() == "idle" &&
-        rideRequestSnapshot.value.toString() == "waiting") {
-      if (rideRequestSnapshot.value != null) {
-        //driverUserReference.set("accepted");
-
-        double sourceLat = double.parse(
-            (rideRequestDetailsSnapshot.value! as Map)["source"]["latitude"]);
-
-        double sourceLng = double.parse(
-            (rideRequestDetailsSnapshot.value! as Map)["source"]["longitude"]);
-
-        String sourceAddress =
-            (rideRequestDetailsSnapshot.value! as Map)["sourceAddress"];
-
-        double destinationLat = double.parse((rideRequestDetailsSnapshot.value!
-            as Map)["destination"]["latitude"]);
-
-        double destinationLng = double.parse((rideRequestDetailsSnapshot.value!
-            as Map)["destination"]["longitude"]);
-
-        String destinationAddress =
-            (rideRequestDetailsSnapshot.value! as Map)["destinationAddress"];
-
-        String userName = (rideRequestDetailsSnapshot.value! as Map)["email"];
-        String userPhone = (rideRequestDetailsSnapshot.value! as Map)["mobile"];
-
-        UserRideRequest userRideRequest = UserRideRequest();
-
-        userRideRequest.sourceLatLng = LatLng(sourceLat, sourceLng);
-        userRideRequest.sourceAddress = sourceAddress;
-        userRideRequest.destinationLatLng =
-            LatLng(destinationLat, destinationLng);
-        userRideRequest.destinationAddress = destinationAddress;
-        userRideRequest.userName = userName;
-        userRideRequest.userPhone = userPhone;
-        userRideRequest.rideRequestId = rideRequestId;
-        globalRideRequestDetail = userRideRequest;
-
-        Navigator.pushNamed(context, DriverNewRideRequestScreen.routeName,
-            arguments: userRideRequest);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +77,7 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                         IconButton(
                           onPressed: () {
                             acceptBookRequest(
+                                context,
                                 snapshot.child("userId").value.toString(),
                                 snapshot!.key!);
                           },
