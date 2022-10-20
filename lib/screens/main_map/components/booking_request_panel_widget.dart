@@ -162,7 +162,11 @@ class _BookRequestPanelWidgetState extends State<BookRequestPanelWidget> {
                                   print(
                                       "DEBUG : panel_widget.dart > DefaultButton > bookRideRequest");
                                   referenceRideRequest = bookRideRequest(
-                                      referenceRideRequest, context);
+                                      referenceRideRequest,
+                                      context,
+                                      Provider.of<AppInfo>(context,
+                                              listen: false)
+                                          .taxiList![selectedTaxi]);
 
                                   userReference = FirebaseDatabase.instance
                                       .ref()
