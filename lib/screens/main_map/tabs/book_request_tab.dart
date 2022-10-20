@@ -13,7 +13,7 @@ import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/models/direction_details_info.dart';
-import 'package:taxi4hire/models/taxi_list.dart';
+import 'package:taxi4hire/models/taxi_type_list.dart';
 import 'package:taxi4hire/screens/main_map/components/booking_request_panel_widget.dart';
 import 'package:taxi4hire/screens/main_map/components/search_places_screen.dart';
 import 'package:taxi4hire/screens/main_map/widget/current_location_data.dart';
@@ -31,7 +31,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
   GoogleMapController? newGoogleMapController;
   final Completer<GoogleMapController> _controllerGoogleMap = Completer();
   final panelController = PanelController();
-  final List<TaxiList> taxiList = [];
+  final List<TaxiTypeList> taxiList = [];
 
   DirectionDetailsInfo? tripDirectionDetailsInfo;
   List<LatLng> pLineCoordinatesList = [];
@@ -78,10 +78,10 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
         Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
 
     var sourceLatLng = LatLng(
-        sourcePosition!.locationLatitude!, sourcePosition.locationLongtitude!);
+        sourcePosition!.locationLatitude!, sourcePosition.locationLongitude!);
 
     var destinationLatLng = LatLng(destinationPosition!.locationLatitude!,
-        destinationPosition.locationLongtitude!);
+        destinationPosition.locationLongitude!);
     showDialog(
       context: context,
       builder: (BuildContext context) => ProgressDialog(
@@ -122,14 +122,14 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
           AssistantMethods.calculateFareAmountFromSourceToDestination(
               directionDetailsInfo, "standard");
 
-      TaxiList tPremium = TaxiList(
+      TaxiTypeList tPremium = TaxiTypeList(
           imgUrl: "assets/images/premium.png",
           type: "Premium",
           distance: directionDetailsInfo!.distance_text,
           duration: directionDetailsInfo!.duration_text,
           price: premiumPrice.toString());
 
-      TaxiList tStandard = TaxiList(
+      TaxiTypeList tStandard = TaxiTypeList(
           imgUrl: "assets/images/standard.png",
           type: "Standard",
           distance: directionDetailsInfo!.distance_text,
@@ -273,9 +273,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
       },
       body: Column(
         children: [
-          !Provider.of<AppInfo>(context, listen: false).requestRideStatus
-              ? sourceAndDestinationWidget()
-              : Container(),
+          sourceAndDestinationWidget(),
           SizedBox(
             height: Provider.of<AppInfo>(context).userDropOffLocation == null
                 ? getProportionateScreenHeight(535)
@@ -288,24 +286,6 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
               myLocationEnabled: true,
               zoomControlsEnabled: true,
               zoomGesturesEnabled: true,
-              // onCameraIdle: () {
-              //   newGoogleMapController!.animateCamera(
-              //     CameraUpdate.newCameraPosition(
-              //       CameraPosition(
-              //         target: LatLng(
-              //             Provider.of<AppInfo>(context)
-              //                 .userPickUpLocation!
-              //                 .locationLatitude!,
-              //             Provider.of<AppInfo>(context)
-              //                 .userPickUpLocation!
-              //                 .locationLongtitude!),
-              //         bearing: 30,
-              //         zoom: 17,
-              //         tilt: 50,
-              //       ),
-              //     ),
-              //   );
-              // },
               markers: markersSet,
               circles: circlesSet,
               polylines: polyLineSet,
@@ -320,7 +300,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
                                   .locationLatitude!,
                               Provider.of<AppInfo>(context, listen: false)
                                   .userPickUpLocation!
-                                  .locationLongtitude!),
+                                  .locationLongitude!),
                           zoom: 14,
                         )
                       : _kGooglePlex,
@@ -367,7 +347,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.add_location_alt_rounded,
                 color: kPrimaryColor,
               ),
@@ -380,8 +360,8 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
                   Text(
                     "From",
                     style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: getProportionateScreenWidth(12),
+                      color: Colors.black54,
+                      fontSize: getProportionateScreenWidth(14),
                     ),
                   ),
                   Text(
@@ -393,8 +373,8 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
                             "..."
                         : "Your current location",
                     style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: getProportionateScreenWidth(14),
+                      color: Colors.black54,
+                      fontSize: getProportionateScreenWidth(16),
                     ),
                   ),
                 ],
@@ -417,19 +397,22 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
           child: GestureDetector(
             onTap: () async {
               //Search Places Screen
-              var responseFromSearchScreen = await Navigator.push(context,
-                  MaterialPageRoute(builder: (c) => SearchPlacesScreen()));
-              print(
-                  "\nDEBUG : book_requests_tab > GestureDetector > responseFromSearchScreen" +
-                      responseFromSearchScreen.toString());
-              if (responseFromSearchScreen == "obtainedDropOff") {
-                // Draw routes and polyline
-                await drawPolyLineFromSourceToDestination();
+              if (!Provider.of<AppInfo>(context, listen: false)
+                  .requestRideStatus) {
+                var responseFromSearchScreen = await Navigator.push(context,
+                    MaterialPageRoute(builder: (c) => SearchPlacesScreen()));
+                print(
+                    "\nDEBUG : book_requests_tab > GestureDetector > responseFromSearchScreen" +
+                        responseFromSearchScreen.toString());
+                if (responseFromSearchScreen == "obtainedDropOff") {
+                  // Draw routes and polyline
+                  await drawPolyLineFromSourceToDestination();
+                }
               }
             },
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.add_location_alt_rounded,
                   color: kPrimaryColor,
                 ),
@@ -442,8 +425,8 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
                     Text(
                       "To",
                       style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: getProportionateScreenWidth(12),
+                        color: Colors.black54,
+                        fontSize: getProportionateScreenWidth(14),
                       ),
                     ),
                     Text(
@@ -453,8 +436,11 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
                               .locationName!)
                           : "Where to go?",
                       style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: getProportionateScreenWidth(14),
+                        color: (!Provider.of<AppInfo>(context, listen: false)
+                                .requestRideStatus)
+                            ? Colors.lightBlue
+                            : Colors.black54,
+                        fontSize: getProportionateScreenWidth(16),
                       ),
                     ),
                   ],
