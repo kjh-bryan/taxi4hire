@@ -1,18 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:taxi4hire/animation/FadeAnimation.dart';
-import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/default_button.dart';
-import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
-import 'package:taxi4hire/controller/map_controller.dart';
 import 'package:taxi4hire/controller/user_controller.dart';
-import 'package:taxi4hire/global/global.dart';
-import 'package:taxi4hire/models/user_model.dart';
-import 'package:taxi4hire/screens/main_map/main_map.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'package:taxi4hire/size_config.dart';
 
