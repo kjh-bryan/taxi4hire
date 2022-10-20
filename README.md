@@ -153,11 +153,13 @@ _For more examples, please refer to the [Documentation](https://example.com)_
     - [x] Sign Up as Customer
     - [x] Sign Up as Taxi Driver
   - [x] Forget Password
-- [ ] Main MapView
-  - [ ] Planned Routes
-- [ ] View Booking Request(Taxi Driver)
-- [ ] Book Request(Customer)
-- [ ] Settings
+- [x] Main MapView
+  - [x] View Booking Request(Taxi Driver)
+  - [x] Book Request(Customer)
+- [ ] Ride Request
+  - [ ] Customer View
+  - [ ] Driver View
+- [ ] Profile
 
 <!-- See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues). -->
 
