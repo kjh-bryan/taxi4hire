@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
+import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/screens/main_map/widget/inherited_widget.dart';
@@ -28,11 +29,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   List<LatLng> polylineCoordinates = [];
   Set<Marker> markersSet = {};
-
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(1.3521, 103.8198),
-    zoom: 14,
-  );
 
   var geoLocator = Geolocator();
 
@@ -210,7 +206,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
           markers: (Provider.of<AppInfo>(context).markersSet != null)
               ? Provider.of<AppInfo>(context).markersSet!
               : markersSet,
-          initialCameraPosition: _kGooglePlex,
+          initialCameraPosition: kSingaporeDefaultLocation,
           onMapCreated: (GoogleMapController controller) async {
             _controllerGoogleMap.complete(controller);
             newGoogleMapController = controller;

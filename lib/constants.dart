@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:taxi4hire/size_config.dart';
 
 const kPrimaryColor = const Color(0xFF296e48);
@@ -44,3 +45,8 @@ const String kInvalidMobileNoError = "Please enter a valid mobile no.";
 const String kLicenseNoNullError = "Please enter your license plate number.";
 const String kkInvalidLicenseNoError =
     "Please enter a valid license plate number.";
+
+const CameraPosition kSingaporeDefaultLocation = CameraPosition(
+  target: LatLng(1.3521, 103.8198),
+  zoom: 14,
+);
