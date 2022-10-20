@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class TaxiList {
+class TaxiTypeList {
   String? imgUrl;
   String? type;
   String? distance;
   String? duration;
   String? price;
 
-  TaxiList({
+  TaxiTypeList({
     required this.imgUrl,
     required this.type,
     required this.distance,

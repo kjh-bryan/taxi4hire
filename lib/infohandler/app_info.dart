@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:taxi4hire/models/directions.dart';
-import 'package:taxi4hire/models/taxi_list.dart';
+import 'package:taxi4hire/models/taxi_type_list.dart';
 import 'package:taxi4hire/models/user_model.dart';
 
 class AppInfo extends ChangeNotifier {
@@ -9,7 +9,7 @@ class AppInfo extends ChangeNotifier {
   UserModel? userModelCurrentInfo;
   GoogleMapController? googleMapController;
   Set<Marker>? markersSet;
-  List<TaxiList>? taxiList;
+  List<TaxiTypeList>? taxiList;
   bool requestRideStatus = false;
 
   void updatePickUpLocationAddress(Directions userPickUpAddress) {
@@ -36,7 +36,7 @@ class AppInfo extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTaxiListDetails(List<TaxiList> newTaxiList) {
+  void updateTaxiListDetails(List<TaxiTypeList> newTaxiList) {
     taxiList = newTaxiList;
 
     notifyListeners();
