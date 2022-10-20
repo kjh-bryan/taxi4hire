@@ -34,7 +34,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     zoom: 14,
   );
 
-  Position? userCurrentLocation;
   var geoLocator = Geolocator();
 
   Future<void> getTaxiAvailability() async {
@@ -105,12 +104,16 @@ class _HomeTabPageState extends State<HomeTabPage> {
       print("\nDEBUG : home_tab > getTaxiAvailabilty > Print ModalRoute > " +
           ModalRoute.of(context)!.settings.name.toString());
       Navigator.pop(context);
-    } else {
-      Navigator.pop(context);
-    }
+    } else {}
   }
 
   locateUserPosition() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext c) {
+          return ProgressDialog(message: "Getting your location..");
+        });
     LocationPermission permission;
     permission = await Geolocator.requestPermission();
 
@@ -134,10 +137,12 @@ class _HomeTabPageState extends State<HomeTabPage> {
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-    String humanReadableAddress =
-        await AssistantMethods.searchAddressForGeographicCoordinates(
-            userCurrentLocation!, context);
-    print("This is your current readable address : " + humanReadableAddress);
+    if (mounted)
+      String humanReadableAddress =
+          await AssistantMethods.searchAddressForGeographicCoordinates(
+              userCurrentLocation!, context);
+    // print("This is your current readable address : " + humanReadableAddress);
+    Navigator.pop(context);
   }
 
   Future<void> drawPolyLineFromSourceToDestination() async {
@@ -147,10 +152,10 @@ class _HomeTabPageState extends State<HomeTabPage> {
         Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
 
     var sourceLatLng = LatLng(
-        sourcePosition!.locationLatitude!, sourcePosition!.locationLongtitude!);
+        sourcePosition!.locationLatitude!, sourcePosition.locationLongitude!);
 
     var destinationLatLng = LatLng(destinationPosition!.locationLatitude!,
-        destinationPosition!.locationLongtitude!);
+        destinationPosition.locationLongitude!);
     showDialog(
       context: context,
       builder: (BuildContext context) => ProgressDialog(

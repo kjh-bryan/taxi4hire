@@ -38,13 +38,6 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
 
     if (_locationPermission == LocationPermission.denied) {
       _locationPermission = await Geolocator.requestPermission();
-    } else {
-      // showDialog(
-      //     context: context,
-      //     barrierDismissible: false,
-      //     builder: (BuildContext c) {
-      //       return ProgressDialog(message: "Getting your location..");
-      //     });
     }
   }
 
