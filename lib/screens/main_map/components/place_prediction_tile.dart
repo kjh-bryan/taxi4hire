@@ -38,7 +38,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
       directions.locationName = responsePlaceId["result"]["name"];
       directions.locationLatitude =
           responsePlaceId["result"]["geometry"]["location"]["lat"];
-      directions.locationLongtitude =
+      directions.locationLongitude =
           responsePlaceId["result"]["geometry"]["location"]["lng"];
       directions.locationId = placeId;
 
@@ -47,7 +47,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
 
       print("\nLocation name = " + directions.locationName!);
       print("\nLocation lat = " + directions.locationLatitude!.toString());
-      print("\nLocation long = " + directions.locationLongtitude!.toString());
+      print("\nLocation long = " + directions.locationLongitude!.toString());
 
       Provider.of<AppInfo>(context, listen: false)
           .updateDropOffLocationAddress(directions);
@@ -66,7 +66,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
         padding: const EdgeInsets.all(4.0),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.add_location,
               color: kPrimaryColor,
             ),
