@@ -35,6 +35,7 @@ DatabaseReference bookRideRequest(DatabaseReference? referenceRideRequest,
     "destination": destinationLocationMap,
     "time": DateTime.now().toString(),
     "email": userModelCurrentInfo!.email,
+    "name": userModelCurrentInfo!.name,
     "sourceAddress": sourceLocation.locationName,
     "destinationAddress": destinationLocation.locationName,
     "mobile": userModelCurrentInfo!.mobile,
@@ -92,7 +93,7 @@ void acceptBookRequest(
       userSnapshot.value.toString() == "idle" &&
       rideRequestSnapshot.value.toString() == "waiting") {
     if (rideRequestSnapshot.value != null) {
-      //driverUserReference.set("accepted");
+      driverUserReference.set("accepted");
 
       double sourceLat = double.parse(
           (rideRequestDetailsSnapshot.value! as Map)["source"]["latitude"]);
@@ -112,7 +113,7 @@ void acceptBookRequest(
       String destinationAddress =
           (rideRequestDetailsSnapshot.value! as Map)["destinationAddress"];
 
-      String userName = (rideRequestDetailsSnapshot.value! as Map)["email"];
+      String userName = (rideRequestDetailsSnapshot.value! as Map)["name"];
       String userPhone = (rideRequestDetailsSnapshot.value! as Map)["mobile"];
 
       UserRideRequest userRideRequest = UserRideRequest();
