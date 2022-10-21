@@ -58,9 +58,9 @@ class AssistantMethods {
 
   static Future<DirectionDetailsInfo?>
       obtainOriginToDestinationDirectionDetails(
-          LatLng originPosition, LatLng destinationPosition) async {
+          LatLng sourcePosition, LatLng destinationPosition) async {
     String urlOriginToDestinationDirectionDetails =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=${originPosition.latitude},${originPosition.longitude}&destination=${destinationPosition.latitude},${destinationPosition.longitude}&key=$mapApiKey";
+        "https://maps.googleapis.com/maps/api/directions/json?origin=${sourcePosition.latitude},${sourcePosition.longitude}&destination=${destinationPosition.latitude},${destinationPosition.longitude}&key=$mapApiKey";
 
     var responseDirectionApi = await RequestAssistant.receiveRequest(
         urlOriginToDestinationDirectionDetails);
