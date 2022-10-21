@@ -22,12 +22,12 @@ DatabaseReference bookRideRequest(DatabaseReference? referenceRideRequest,
 
   Map sourceLocationMap = {
     "latitude": sourceLocation!.locationLatitude.toString(),
-    "longitude": sourceLocation!.locationLongitude.toString(),
+    "longitude": sourceLocation.locationLongitude.toString(),
   };
 
   Map destinationLocationMap = {
     "latitude": destinationLocation!.locationLatitude.toString(),
-    "longitude": destinationLocation!.locationLongitude.toString(),
+    "longitude": destinationLocation.locationLongitude.toString(),
   };
 
   Map userInformationMap = {

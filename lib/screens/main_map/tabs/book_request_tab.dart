@@ -102,7 +102,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
 
     PolylinePoints pPoints = PolylinePoints();
     List<PointLatLng> decodedPolyLinePointsResultList =
-        pPoints.decodePolyline(directionDetailsInfo!.e_points!);
+        pPoints.decodePolyline(directionDetailsInfo.e_points!);
 
     pLineCoordinatesList.clear();
 
@@ -125,15 +125,15 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
       TaxiTypeList tPremium = TaxiTypeList(
           imgUrl: "assets/images/premium.png",
           type: "Premium",
-          distance: directionDetailsInfo!.distance_text,
-          duration: directionDetailsInfo!.duration_text,
+          distance: directionDetailsInfo.distance_text,
+          duration: directionDetailsInfo.duration_text,
           price: premiumPrice.toString());
 
       TaxiTypeList tStandard = TaxiTypeList(
           imgUrl: "assets/images/standard.png",
           type: "Standard",
-          distance: directionDetailsInfo!.distance_text,
-          duration: directionDetailsInfo!.duration_text,
+          distance: directionDetailsInfo.distance_text,
+          duration: directionDetailsInfo.duration_text,
           price: standardPrice.toString());
 
       taxiList.clear();

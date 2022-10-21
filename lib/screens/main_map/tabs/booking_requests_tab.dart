@@ -79,7 +79,7 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                             acceptBookRequest(
                                 context,
                                 snapshot.child("userId").value.toString(),
-                                snapshot!.key!);
+                                snapshot.key!);
                           },
                           icon: const Icon(Icons.check, color: kPrimaryColor),
                         ),
