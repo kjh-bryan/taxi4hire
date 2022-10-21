@@ -19,15 +19,38 @@ class BookingRequestsTabPage extends StatefulWidget {
 }
 
 class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
-  List<UserRideRequest> _userRideRequestList = [];
-  final ref = FirebaseDatabase.instance.ref("ride_request");
+  final ride_request_reference = FirebaseDatabase.instance.ref("ride_request");
 
-  Future getBookingRequestList() async {
-    var data = await FirebaseDatabase.instance.ref().child("ride_request");
-  }
+  List<UserRideRequest> _userRideRequestList = [];
 
   bool _tileExpanded = false;
   int _expandedTile = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ride_request_reference.onChildAdded.listen(_childAdded);
+    ride_request_reference.onChildRemoved.listen(_childRemoved);
+  }
+
+  _childAdded(DatabaseEvent event) {
+    print("Child added ");
+    setState(() {
+      _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
+    });
+  }
+
+  _childRemoved(DatabaseEvent event) {
+    print("Childremove ");
+    var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
+      return rideRequest.rideRequestId == event.snapshot.key;
+    });
+    setState(() {
+      _userRideRequestList
+          .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,67 +58,90 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
       padding: const EdgeInsets.only(top: 20),
       child: SizedBox(
         width: double.infinity,
-        child: FirebaseAnimatedList(
-          query: ref,
-          itemBuilder: (context, snapshot, animation, index) {
-            return Card(
-              elevation: 4,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
-                child: ExpansionTile(
-                  iconColor: kPrimaryColor,
-                  collapsedBackgroundColor: Colors.grey[200],
-                  childrenPadding: EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
-                  title: Text(
-                    "To: " +
-                        snapshot.child("destinationAddress").value.toString(),
-                    style: TextStyle(color: kPrimaryColor),
-                  ),
-                  subtitle: Text(
-                    "From: " + snapshot.child("sourceAddress").value.toString(),
-                  ),
-                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "From: " +
-                          snapshot.child("sourceAddress").value.toString(),
+        child: (_userRideRequestList.isEmpty)
+            ? SizedBox(
+                child: Center(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: const Text(
+                      "No available booking requests",
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
                     ),
-                    Text("Distance: " +
-                        snapshot.child("distance").value.toString()),
-                    Text("Duration: " +
-                        snapshot.child("duration").value.toString()),
-                    Text("Estimated Earnings: S\$" +
-                        snapshot.child("price").value.toString()),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "Accept",
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            acceptBookRequest(
-                                context,
-                                snapshot.child("userId").value.toString(),
-                                snapshot.key!);
-                          },
-                          icon: const Icon(Icons.check, color: kPrimaryColor),
-                        ),
-                      ],
-                    )
-                  ],
-                  onExpansionChanged: (bool expanded) {
-                    setState(() {
-                      _tileExpanded = expanded;
-                    });
-                  },
+                  ),
                 ),
+              )
+            : FirebaseAnimatedList(
+                query: ride_request_reference,
+                itemBuilder: (context, snapshot, animation, index) {
+                  return Card(
+                    elevation: 4,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
+                      child: ExpansionTile(
+                        iconColor: kPrimaryColor,
+                        collapsedBackgroundColor: Colors.grey[200],
+                        childrenPadding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        title: Text(
+                          "To: " +
+                              snapshot
+                                  .child("destinationAddress")
+                                  .value
+                                  .toString(),
+                          style: TextStyle(color: kPrimaryColor),
+                        ),
+                        subtitle: Text(
+                          "From: " +
+                              snapshot.child("sourceAddress").value.toString(),
+                        ),
+                        expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "From: " +
+                                snapshot
+                                    .child("sourceAddress")
+                                    .value
+                                    .toString(),
+                          ),
+                          Text("Distance: " +
+                              snapshot.child("distance").value.toString()),
+                          Text("Duration: " +
+                              snapshot.child("duration").value.toString()),
+                          Text("Estimated Earnings: S\$" +
+                              snapshot.child("price").value.toString()),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "Accept",
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  acceptBookRequest(
+                                      context,
+                                      snapshot.child("userId").value.toString(),
+                                      snapshot.key!);
+                                },
+                                icon: const Icon(Icons.check,
+                                    color: kPrimaryColor),
+                              ),
+                            ],
+                          )
+                        ],
+                        onExpansionChanged: (bool expanded) {
+                          setState(() {
+                            _tileExpanded = expanded;
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
     );
   }

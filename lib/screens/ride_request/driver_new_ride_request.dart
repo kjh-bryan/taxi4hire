@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/default_button.dart';
+import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/models/user_ride_request.dart';
@@ -27,6 +30,15 @@ class _DriverNewRideRequestScreenState
   String? buttonTitle = "Arrived";
   Color? buttonColor = kPrimaryColor;
 
+  Set<Marker> setOfMarkers = Set<Marker>();
+  Set<Circle> setOfCircle = Set<Circle>();
+  Set<Polyline> setOfPolyline = Set<Polyline>();
+  List<LatLng> polyLinePositionCoordinates = [];
+
+  PolylinePoints polylinePoints = PolylinePoints();
+
+  double mapPadding = 0;
+
   assignedDriverToRideRequest() {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
@@ -38,6 +50,96 @@ class _DriverNewRideRequestScreenState
       "latitude": userCurrentLocation!.latitude.toString(),
       "longitude": userCurrentLocation!.longitude.toString()
     };
+  }
+
+  Future<void> drawPolyLineFromSourceToDestination(
+      LatLng sourceLatLng, LatLng destinationLatLng) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => ProgressDialog(
+        message: "Please wait...",
+      ),
+    );
+    var directionDetailsInfo =
+        await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+            sourceLatLng, destinationLatLng);
+
+    Navigator.pop(context);
+
+    PolylinePoints pPoints = PolylinePoints();
+    List<PointLatLng> decodedPolyLinePointsResultList =
+        pPoints.decodePolyline(directionDetailsInfo!.e_points!);
+
+    polyLinePositionCoordinates.clear();
+
+    if (decodedPolyLinePointsResultList.isNotEmpty) {
+      decodedPolyLinePointsResultList.forEach((PointLatLng pointLatLng) {
+        polyLinePositionCoordinates
+            .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
+      });
+    }
+
+    setOfPolyline.clear();
+
+    setState(() {
+      Polyline polyline = Polyline(
+        color: kPrimaryColor,
+        polylineId: PolylineId("PolylineID"),
+        jointType: JointType.round,
+        points: polyLinePositionCoordinates,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        geodesic: true,
+      );
+
+      setOfPolyline.add(polyline);
+    });
+
+    LatLngBounds boundsLatLng;
+    double southWestLat;
+    double southWestLong;
+    double northEastLat;
+    double northEastLong;
+
+    if (sourceLatLng.latitude <= destinationLatLng.latitude) {
+      southWestLat = sourceLatLng.latitude;
+      northEastLat = destinationLatLng.latitude;
+    } else {
+      northEastLat = sourceLatLng.latitude;
+      southWestLat = destinationLatLng.latitude;
+    }
+
+    if (sourceLatLng.longitude <= destinationLatLng.longitude) {
+      southWestLong = sourceLatLng.longitude;
+      northEastLong = destinationLatLng.longitude;
+    } else {
+      northEastLong = sourceLatLng.longitude;
+      southWestLong = destinationLatLng.longitude;
+    }
+    boundsLatLng = LatLngBounds(
+      southwest: LatLng(southWestLat, southWestLong),
+      northeast: LatLng(northEastLat, northEastLong),
+    );
+
+    newRideGoogleMapController!
+        .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 60));
+
+    Marker sourceMarker = Marker(
+      markerId: MarkerId("sourceId"),
+      position: sourceLatLng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+    );
+
+    Marker destinationMarker = Marker(
+      markerId: MarkerId("destinationId"),
+      position: destinationLatLng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+    );
+
+    setState(() {
+      setOfMarkers.add(sourceMarker);
+      setOfMarkers.add(destinationMarker);
+    });
   }
 
   @override
@@ -54,14 +156,30 @@ class _DriverNewRideRequestScreenState
       body: Stack(
         children: [
           GoogleMap(
+            padding: EdgeInsets.only(bottom: mapPadding),
             mapType: MapType.normal,
             myLocationEnabled: true,
             zoomControlsEnabled: true,
             zoomGesturesEnabled: true,
+            markers: setOfMarkers,
+            // circles: setOfCircle,
+            polylines: setOfPolyline,
             initialCameraPosition: kSingaporeDefaultLocation,
             onMapCreated: (GoogleMapController controller) async {
               _controllerGoogleMap.complete(controller);
               newRideGoogleMapController = controller;
+
+              setState(() {
+                mapPadding = 270;
+              });
+
+              var driverCurrentLatLng = LatLng(userCurrentLocation!.latitude,
+                  userCurrentLocation!.longitude);
+
+              var userPickUpLatLng = rideRequestDetail.sourceLatLng;
+
+              drawPolyLineFromSourceToDestination(
+                  driverCurrentLatLng, userPickUpLatLng!);
             },
           ),
           Positioned(
