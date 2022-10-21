@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/default_button.dart';
@@ -38,6 +39,14 @@ class _DriverNewRideRequestScreenState
   PolylinePoints polylinePoints = PolylinePoints();
 
   double mapPadding = 0;
+  BitmapDescriptor? iconAnimatedMarker;
+  var geoLocator = Geolocator();
+  Position? localDriverCurrentPosition;
+
+  String rideRequestStatus = "accepted";
+  String durationFromSourceToDestination = "";
+
+  bool isRequestDirectionDetail = false;
 
   assignedDriverToRideRequest() {
     DatabaseReference databaseReference = FirebaseDatabase.instance
@@ -50,6 +59,12 @@ class _DriverNewRideRequestScreenState
       "latitude": userCurrentLocation!.latitude.toString(),
       "longitude": userCurrentLocation!.longitude.toString()
     };
+
+    databaseReference.child("driverLatLng").set(driverLocationDataMap);
+    databaseReference.child("status").set("accepted");
+    databaseReference.child("driverId").set(userModelCurrentInfo!.id);
+    databaseReference.child("driverName").set(userModelCurrentInfo!.name);
+    databaseReference.child("driverPhone").set(userModelCurrentInfo!.mobile);
   }
 
   Future<void> drawPolyLineFromSourceToDestination(
@@ -146,10 +161,105 @@ class _DriverNewRideRequestScreenState
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    assignedDriverToRideRequest();
+  }
+
+  createDriverIconMarker() {
+    if (iconAnimatedMarker == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, "assets/images/car.png")
+          .then((value) {
+        iconAnimatedMarker = value;
+      });
+    }
+  }
+
+  updateDurationTimeAtRealTime() async {
+    if (isRequestDirectionDetail == false) {
+      isRequestDirectionDetail = true;
+
+      if (userCurrentLocation == null) {
+        return;
+      }
+
+      var sourceLatLng =
+          LatLng(userCurrentLocation!.latitude, userCurrentLocation!.longitude);
+      var destinationLatLng;
+      if (rideRequestStatus == "accepted") {
+        destinationLatLng = localRideRequestDetail!.sourceLatLng;
+      } else {
+        destinationLatLng = localRideRequestDetail!.destinationLatLng;
+      }
+
+      var directionInformation =
+          await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+              sourceLatLng, destinationLatLng);
+
+      if (directionInformation != null) {
+        if (mounted) {
+          setState(() {
+            durationFromSourceToDestination =
+                directionInformation.duration_text!;
+          });
+        }
+      }
+
+      isRequestDirectionDetail = false;
+    }
+  }
+
+  updateLiveLocationAtRealTime() {
+    LatLng oldLatLng = LatLng(0, 0);
+
+    streamSubscriptionRideRequestLivePosition =
+        Geolocator.getPositionStream().listen((Position position) {
+      userCurrentLocation = position;
+      localDriverCurrentPosition = position;
+
+      LatLng latLngDriverPosition =
+          LatLng(userCurrentLocation!.latitude, userCurrentLocation!.longitude);
+
+      Marker animatingMarker = Marker(
+        markerId: MarkerId("AnimatedMarker"),
+        position: latLngDriverPosition,
+        icon: iconAnimatedMarker!,
+        infoWindow: InfoWindow(title: "Your current location"),
+      );
+
+      setState(() {
+        CameraPosition cameraPosition =
+            CameraPosition(target: latLngDriverPosition, zoom: 15);
+
+        newRideGoogleMapController!
+            .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+        setOfMarkers.removeWhere(
+            (element) => element.markerId.value == "AnimatedMarker");
+        setOfMarkers.add(animatingMarker);
+      });
+      oldLatLng = latLngDriverPosition;
+      updateDurationTimeAtRealTime();
+
+      Map driverLatLngDataMap = {
+        "latitude": userCurrentLocation!.latitude,
+        "longitude": userCurrentLocation!.longitude,
+      };
+
+      FirebaseDatabase.instance
+          .ref()
+          .child("ride_request")
+          .child(localRideRequestDetail!.rideRequestId!)
+          .child("driverLocation")
+          .set(driverLatLngDataMap);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    createDriverIconMarker();
     final rideRequestDetail =
         ModalRoute.of(context)!.settings.arguments as UserRideRequest;
     return Scaffold(
@@ -170,7 +280,7 @@ class _DriverNewRideRequestScreenState
               newRideGoogleMapController = controller;
 
               setState(() {
-                mapPadding = 270;
+                mapPadding = 350;
               });
 
               var driverCurrentLatLng = LatLng(userCurrentLocation!.latitude,
@@ -180,6 +290,8 @@ class _DriverNewRideRequestScreenState
 
               drawPolyLineFromSourceToDestination(
                   driverCurrentLatLng, userPickUpLatLng!);
+
+              updateLiveLocationAtRealTime();
             },
           ),
           Positioned(
@@ -209,7 +321,7 @@ class _DriverNewRideRequestScreenState
                   children: [
                     //Duration
                     Text(
-                      "test minutes",
+                      durationFromSourceToDestination,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,

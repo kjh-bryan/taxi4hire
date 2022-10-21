@@ -175,7 +175,11 @@ class _BookRequestPanelWidgetState extends State<BookRequestPanelWidget> {
                                       .child("ride_request");
 
                                   userReference!.set("waiting");
-                                  userReference!.onValue.listen((event) {});
+                                  userReference!.onValue.listen((event) {
+                                    print(
+                                        "DEBUG : user ride_request changed to : " +
+                                            event.snapshot.value.toString());
+                                  });
 
                                   Future.delayed(Duration(seconds: 10), () {
                                     print(
