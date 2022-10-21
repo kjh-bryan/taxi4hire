@@ -24,6 +24,9 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
   int selectedIndex = 0;
   var geoLocation = Geolocator();
 
+  @override
+  bool get wantKeepAlive => true;
+
   onItemClicked(int index) {
     setState(() {
       selectedIndex = index;
