@@ -23,7 +23,8 @@ class HomeTabPage extends StatefulWidget {
   State<HomeTabPage> createState() => _HomeTabPageState();
 }
 
-class _HomeTabPageState extends State<HomeTabPage> {
+class _HomeTabPageState extends State<HomeTabPage>
+    with AutomaticKeepAliveClientMixin {
   GoogleMapController? newGoogleMapController;
   final Completer<GoogleMapController> _controllerGoogleMap = Completer();
 
@@ -53,13 +54,13 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
         for (var i = 0; i < features.length; i++) {
           Marker marker = Marker(
-            markerId: MarkerId("marker_id_" + i.toString()),
+            markerId: MarkerId("Taxi - " + i.toString()),
             position: LatLng(
               double.parse(features[i][1].toString()),
               double.parse(features[i][0].toString()),
             ),
             infoWindow: InfoWindow(
-              title: "marker_id_" + i.toString(),
+              title: "Taxi - " + i.toString(),
             ),
             icon: markerbitmap,
           );
@@ -77,30 +78,23 @@ class _HomeTabPageState extends State<HomeTabPage> {
         print('\nDEBUG :Request failed with status: ${response.statusCode}.');
       }
 
-      // Marker firstMarker = Marker(
-      //   markerId: MarkerId("source"),
-      //   position: LatLng(sourceLocation.latitude, sourceLocation.longitude),
-      //   infoWindow: InfoWindow(
-      //     title: "Source Location",
-      //   ),
-      //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      // );
-
-      // Marker secondMarker = Marker(
-      //   markerId: MarkerId("destination"),
-      //   position: LatLng(destination.latitude, destination.longitude),
-      //   infoWindow: InfoWindow(
-      //     title: "Destination",
-      //   ),
-      //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      // );
-
-      // markersList.add(firstMarker);
-      // markersList.add(secondMarker);
       print("\nDEBUG : home_tab > getTaxiAvailabilty > Print ModalRoute > " +
           ModalRoute.of(context)!.settings.name.toString());
       Navigator.pop(context);
     } else {}
+  }
+
+  updateLiveLocationAtRealTime() {
+    streamSubscriptionLivePosition =
+        Geolocator.getPositionStream().listen((Position position) {
+      userCurrentLocation = position;
+
+      LatLng latLngLivePosition =
+          LatLng(userCurrentLocation!.latitude, userCurrentLocation!.longitude);
+
+      newGoogleMapController!
+          .animateCamera(CameraUpdate.newLatLng(latLngLivePosition));
+    });
   }
 
   locateUserPosition() async {
@@ -196,6 +190,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Stack(
       children: [
         GoogleMap(
@@ -212,7 +207,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
             newGoogleMapController = controller;
 
             locateUserPosition();
-
+            updateLiveLocationAtRealTime();
             print("\nDEBUG : home_tab > build > onMapCreated > " +
                 userModelCurrentInfo!.role.toString());
             setState(() {});
@@ -231,4 +226,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
       ],
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
