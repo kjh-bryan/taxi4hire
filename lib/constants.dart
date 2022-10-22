@@ -4,14 +4,16 @@ import 'package:taxi4hire/size_config.dart';
 
 const kPrimaryColor = const Color(0xFF296e48);
 //const kPrimaryColor = const Color(0xFFFF7643);
+const kSecondaryColor = const Color(0xFF2e8b57);
 const kPrimaryLightColor = const Color(0xFFFFECDF);
+const kLavenderBlushColor = const Color(0xFFcb2821);
 const kPrimaryGradientColor = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
   colors: [Color(0xFFFFA53E), Color(0xFFFF7643)],
 );
 
-const kSecondaryColor = Color(0xFF979797);
+// const kSecondaryColor = Color(0xFF979797);
 const kTextColor = Color(0xFF757575);
 
 const kAnimationDuration = Duration(milliseconds: 200);
