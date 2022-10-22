@@ -53,7 +53,7 @@ DatabaseReference bookRideRequest(DatabaseReference? referenceRideRequest,
   return referenceRideRequest;
 }
 
-void checkExistingBookRequest(BuildContext context, String userId) {}
+// void checkExistingBookRequest(BuildContext context, String userId) {}
 
 void acceptBookRequest(
     BuildContext context, String userId, String rideRequestId) async {

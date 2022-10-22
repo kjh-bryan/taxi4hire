@@ -27,7 +27,8 @@ class BookRequestsTabPage extends StatefulWidget {
   State<BookRequestsTabPage> createState() => _BookRequestsTabPageState();
 }
 
-class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
+class _BookRequestsTabPageState extends State<BookRequestsTabPage>
+    with AutomaticKeepAliveClientMixin {
   GoogleMapController? newGoogleMapController;
   final Completer<GoogleMapController> _controllerGoogleMap = Completer();
   final panelController = PanelController();
@@ -46,10 +47,6 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
 
   Position? userCurrentLocation;
   var geoLocator = Geolocator();
-
-  saveRideRequestInformation() {
-    //Save rid request information
-  }
 
   locateUserPosition() async {
     Position cPosition = await Geolocator.getCurrentPosition(
@@ -277,10 +274,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
           SizedBox(
             height: Provider.of<AppInfo>(context).userDropOffLocation == null
                 ? getProportionateScreenHeight(535)
-                : !Provider.of<AppInfo>(context, listen: false)
-                        .requestRideStatus
-                    ? getProportionateScreenHeight(250)
-                    : getProportionateScreenHeight(430),
+                : getProportionateScreenHeight(240),
             child: GoogleMap(
               mapType: MapType.normal,
               myLocationEnabled: true,
@@ -469,4 +463,8 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage> {
       ],
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
