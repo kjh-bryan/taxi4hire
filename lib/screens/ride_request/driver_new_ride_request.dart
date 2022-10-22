@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -30,7 +31,6 @@ class _DriverNewRideRequestScreenState
 
   String? buttonTitle = "Arrived";
   Color? buttonColor = kPrimaryColor;
-
   Set<Marker> setOfMarkers = Set<Marker>();
   Set<Circle> setOfCircle = Set<Circle>();
   Set<Polyline> setOfPolyline = Set<Polyline>();
@@ -175,6 +175,32 @@ class _DriverNewRideRequestScreenState
         iconAnimatedMarker = value;
       });
     }
+  }
+
+  endRideRequest() async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext c) => ProgressDialog(
+        message: "Loading..",
+      ),
+    );
+
+    var currentPositionLatLng = LatLng(
+      userCurrentLocation!.latitude,
+      userCurrentLocation!.longitude,
+    );
+
+    FirebaseDatabase.instance
+        .ref()
+        .child("ride_request")
+        .child(localRideRequestDetail!.rideRequestId!)
+        .child("status")
+        .set("ended");
+
+    streamSubscriptionRideRequestLivePosition!.cancel();
+
+    Navigator.pop(context);
   }
 
   updateDurationTimeAtRealTime() async {
@@ -424,7 +450,78 @@ class _DriverNewRideRequestScreenState
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () async {
+                          if (rideRequestStatus == "accepted") {
+                            rideRequestStatus = "arrived";
+
+                            FirebaseDatabase.instance
+                                .ref()
+                                .child("ride_request")
+                                .child(rideRequestDetail.rideRequestId!)
+                                .child("status")
+                                .set(rideRequestStatus);
+
+                            FirebaseDatabase.instance
+                                .ref()
+                                .child("users")
+                                .child(rideRequestDetail.userId!)
+                                .child("ride_request")
+                                .set(rideRequestDetail);
+
+                            setState(() {
+                              buttonTitle = "Start Ride Request";
+                              buttonColor = kSecondaryColor;
+                            });
+
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (BuildContext c) => ProgressDialog(
+                                message: "Loading..",
+                              ),
+                            );
+
+                            await drawPolyLineFromSourceToDestination(
+                              rideRequestDetail.sourceLatLng!,
+                              rideRequestDetail.destinationLatLng!,
+                            );
+
+                            Navigator.pop(context);
+                          } else if (rideRequestStatus == "arrived") {
+                            rideRequestStatus = "onriderequest";
+
+                            FirebaseDatabase.instance
+                                .ref()
+                                .child("ride_request")
+                                .child(rideRequestDetail.rideRequestId!)
+                                .child("status")
+                                .set(rideRequestStatus);
+
+                            FirebaseDatabase.instance
+                                .ref()
+                                .child("users")
+                                .child(rideRequestDetail.userId!)
+                                .child("ride_request")
+                                .set(rideRequestDetail);
+
+                            setState(() {
+                              buttonTitle = "End Ride Request";
+                              buttonColor = kLavenderBlushColor;
+                            });
+
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (BuildContext c) => ProgressDialog(
+                                message: "Loading..",
+                              ),
+                            );
+
+                            Navigator.pop(context);
+                          } else if (rideRequestStatus == "onriderequest") {
+                            endRideRequest();
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           primary: buttonColor,
                           shape: RoundedRectangleBorder(

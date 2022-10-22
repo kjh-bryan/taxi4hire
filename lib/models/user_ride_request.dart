@@ -9,15 +9,18 @@ class UserRideRequest {
   String? rideRequestId;
   String? userName;
   String? userPhone;
+  String? userId;
 
-  UserRideRequest(
-      {this.sourceLatLng,
-      this.destinationLatLng,
-      this.sourceAddress,
-      this.destinationAddress,
-      this.rideRequestId,
-      this.userName,
-      this.userPhone});
+  UserRideRequest({
+    this.sourceLatLng,
+    this.destinationLatLng,
+    this.sourceAddress,
+    this.destinationAddress,
+    this.rideRequestId,
+    this.userName,
+    this.userPhone,
+    this.userId,
+  });
 
   UserRideRequest.fromSnapshot(DataSnapshot snap) {
     rideRequestId = snap.key;
@@ -31,5 +34,6 @@ class UserRideRequest {
     destinationAddress = (snap.value as dynamic)["desinationAddress"];
     userName = (snap.value as dynamic)["name"];
     userPhone = (snap.value as dynamic)["mobile"];
+    userId = (snap.value as dynamic)["userId"];
   }
 }
