@@ -72,8 +72,14 @@ class AssistantMethods {
     }
     print(
         "DEBUG : AssistantMethods > obtainOriginToDestinationDirection > Successful");
+    print(
+        "DEBUG : AssistantMethods > obtainOriginToDestinationDirection > Successful > User : " +
+            userModelCurrentInfo!.name!);
     DirectionDetailsInfo directionDetailsInfo = DirectionDetailsInfo();
 
+    print(
+        "DEBUG : AssistantMethods > obtainOriginToDestinationDirection > Successful > User : > Response api " +
+            responseDirectionApi.toString());
     directionDetailsInfo.e_points =
         responseDirectionApi["routes"][0]["overview_polyline"]["points"];
     directionDetailsInfo.distance_text =

@@ -17,6 +17,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
   getPlaceDirectionDetails(String? placeId, context) async {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) => ProgressDialog(
         message: "Setting up drop off location",
       ),
@@ -60,6 +61,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
+        FocusScope.of(context).unfocus();
         getPlaceDirectionDetails(predictedPlaces!.place_id, context);
       },
       child: Padding(

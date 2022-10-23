@@ -50,5 +50,5 @@ const String kkInvalidLicenseNoError =
 
 const CameraPosition kSingaporeDefaultLocation = CameraPosition(
   target: LatLng(1.3521, 103.8198),
-  zoom: 14,
+  zoom: 15,
 );

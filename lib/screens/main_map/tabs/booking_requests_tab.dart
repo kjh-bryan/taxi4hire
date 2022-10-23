@@ -32,17 +32,18 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
     super.initState();
     ride_request_reference.onChildAdded.listen(_childAdded);
     ride_request_reference.onChildRemoved.listen(_childRemoved);
+    ride_request_reference.onChildChanged.listen(_childChanged);
   }
 
   _childAdded(DatabaseEvent event) {
-    print("Child added ");
-    setState(() {
-      _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
-    });
+    if (event.snapshot.child("driverId").value == "waiting") {
+      setState(() {
+        _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
+      });
+    }
   }
 
   _childRemoved(DatabaseEvent event) {
-    print("Childremove ");
     var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
       return rideRequest.rideRequestId == event.snapshot.key;
     });
@@ -50,6 +51,23 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
       _userRideRequestList
           .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
     });
+  }
+
+  _childChanged(DatabaseEvent event) {
+    print("DEBUG : CHILDCHANGED");
+    if (event.snapshot.child("driverId").value == "waiting") {
+      setState(() {
+        _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
+      });
+    } else {
+      var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
+        return rideRequest.rideRequestId == event.snapshot.key;
+      });
+      setState(() {
+        _userRideRequestList
+            .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
+      });
+    }
   }
 
   @override
@@ -73,7 +91,9 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                 ),
               )
             : FirebaseAnimatedList(
-                query: ride_request_reference,
+                query: ride_request_reference
+                    .orderByChild("driverId")
+                    .equalTo("waiting"),
                 itemBuilder: (context, snapshot, animation, index) {
                   return Card(
                     elevation: 4,
@@ -121,7 +141,7 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  acceptBookRequest(
+                                  acceptRideRequest(
                                       context,
                                       snapshot.child("userId").value.toString(),
                                       snapshot.key!);

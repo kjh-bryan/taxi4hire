@@ -8,9 +8,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/default_button.dart';
+import 'package:taxi4hire/components/payment_collection_dialog.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/global/global.dart';
+import 'package:taxi4hire/main.dart';
 import 'package:taxi4hire/models/user_ride_request.dart';
 
 class DriverNewRideRequestScreen extends StatefulWidget {
@@ -65,11 +67,15 @@ class _DriverNewRideRequestScreenState
     databaseReference.child("driverId").set(userModelCurrentInfo!.id);
     databaseReference.child("driverName").set(userModelCurrentInfo!.name);
     databaseReference.child("driverPhone").set(userModelCurrentInfo!.mobile);
+    databaseReference
+        .child("driverLicensePlate")
+        .set(userModelCurrentInfo!.license_plate);
   }
 
   Future<void> drawPolyLineFromSourceToDestination(
       LatLng sourceLatLng, LatLng destinationLatLng) async {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => ProgressDialog(
         message: "Please wait...",
@@ -201,6 +207,17 @@ class _DriverNewRideRequestScreenState
     streamSubscriptionRideRequestLivePosition!.cancel();
 
     Navigator.pop(context);
+
+    var response = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext c) => PaymentCollectionDialog(
+            paymentAmount: localRideRequestDetail!.price!));
+
+    setState(() {
+      print("restart app");
+      MyApp.restartApp(context);
+    });
   }
 
   updateDurationTimeAtRealTime() async {
@@ -259,8 +276,9 @@ class _DriverNewRideRequestScreenState
         CameraPosition cameraPosition =
             CameraPosition(target: latLngDriverPosition, zoom: 15);
 
-        newRideGoogleMapController!
-            .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+        if (mounted)
+          newRideGoogleMapController!
+              .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
         setOfMarkers.removeWhere(
             (element) => element.markerId.value == "AnimatedMarker");
@@ -327,16 +345,16 @@ class _DriverNewRideRequestScreenState
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(36),
                   topRight: Radius.circular(36),
                 ),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.white30,
-                    blurRadius: 18,
-                    spreadRadius: .5,
-                    offset: Offset(.6, .6),
+                    color: Colors.grey,
+                    blurRadius: 4,
+                    spreadRadius: 2,
+                    offset: Offset(1, 0),
                   ),
                 ],
               ),
@@ -457,16 +475,16 @@ class _DriverNewRideRequestScreenState
                             FirebaseDatabase.instance
                                 .ref()
                                 .child("ride_request")
-                                .child(rideRequestDetail.rideRequestId!)
+                                .child(localRideRequestDetail!.rideRequestId!)
                                 .child("status")
                                 .set(rideRequestStatus);
 
                             FirebaseDatabase.instance
                                 .ref()
                                 .child("users")
-                                .child(rideRequestDetail.userId!)
+                                .child(localRideRequestDetail!.userId!)
                                 .child("ride_request")
-                                .set(rideRequestDetail);
+                                .set(rideRequestStatus);
 
                             setState(() {
                               buttonTitle = "Start Ride Request";
@@ -493,16 +511,16 @@ class _DriverNewRideRequestScreenState
                             FirebaseDatabase.instance
                                 .ref()
                                 .child("ride_request")
-                                .child(rideRequestDetail.rideRequestId!)
+                                .child(localRideRequestDetail!.rideRequestId!)
                                 .child("status")
                                 .set(rideRequestStatus);
 
                             FirebaseDatabase.instance
                                 .ref()
                                 .child("users")
-                                .child(rideRequestDetail.userId!)
+                                .child(localRideRequestDetail!.userId!)
                                 .child("ride_request")
-                                .set(rideRequestDetail);
+                                .set(rideRequestStatus);
 
                             setState(() {
                               buttonTitle = "End Ride Request";
@@ -537,7 +555,7 @@ class _DriverNewRideRequestScreenState
                           buttonTitle!,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 15,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

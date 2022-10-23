@@ -55,7 +55,7 @@ DatabaseReference bookRideRequest(DatabaseReference? referenceRideRequest,
 
 // void checkExistingBookRequest(BuildContext context, String userId) {}
 
-void acceptBookRequest(
+void acceptRideRequest(
     BuildContext context, String userId, String rideRequestId) async {
   print(
       "DEBUG > booking_request_tab > accept Request > userId : $userId > rideRequestId : $rideRequestId");
@@ -86,17 +86,15 @@ void acceptBookRequest(
       .child("ride_request")
       .child(rideRequestId)
       .child("driverId");
-  final rideRequestSnapshot = await rideRequestDriverIdReference.get();
+  final rideRequestDriverIdSnapshot = await rideRequestDriverIdReference.get();
 
   //print(
   //    "DEBUG > booking_request_tab > acceptRequest > requestSnapShot : ${requestSnapshot.value} > userSnapShot : ${userSnapshot.value}> rideRequestSnapshot : ${rideRequestSnapshot.value}");
 
   if (requestSnapshot.value.toString() == "waiting" &&
       userSnapshot.value.toString() == "idle" &&
-      rideRequestSnapshot.value.toString() == "waiting") {
-    if (rideRequestSnapshot.value != null) {
-      driverUserReference.set("accepted");
-
+      rideRequestDriverIdSnapshot.value.toString() == "waiting") {
+    if (rideRequestDriverIdSnapshot.value != null) {
       double sourceLat = double.parse(
           (rideRequestDetailsSnapshot.value! as Map)["source"]["latitude"]);
 
@@ -117,6 +115,9 @@ void acceptBookRequest(
 
       String userName = (rideRequestDetailsSnapshot.value! as Map)["name"];
       String userPhone = (rideRequestDetailsSnapshot.value! as Map)["mobile"];
+      String price =
+          (rideRequestDetailsSnapshot.value! as Map)["price"].toString();
+      String userId = (rideRequestDetailsSnapshot.value! as Map)["userId"];
 
       UserRideRequest userRideRequest = UserRideRequest();
 
@@ -127,8 +128,14 @@ void acceptBookRequest(
       userRideRequest.destinationAddress = destinationAddress;
       userRideRequest.userName = userName;
       userRideRequest.userPhone = userPhone;
+      userRideRequest.price = price;
+      userRideRequest.userId = userId;
       userRideRequest.rideRequestId = rideRequestId;
       globalRideRequestDetail = userRideRequest;
+
+      driverUserReference.set("accepted");
+      rideRequestDetailsReference.child("status").set("accepted");
+      rideRequestDriverIdReference.set(userModelCurrentInfo!.id);
 
       Navigator.pushNamed(context, DriverNewRideRequestScreen.routeName,
           arguments: userRideRequest);
