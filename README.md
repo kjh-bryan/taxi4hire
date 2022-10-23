@@ -156,10 +156,10 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Main MapView
   - [x] View Booking Request(Taxi Driver)
   - [x] Book Request(Customer)
-- [ ] Ride Request
-  - [ ] Customer View
-  - [ ] Driver View
-- [ ] Profile
+- [x] Ride Request
+  - [x] Customer View
+  - [x] Driver View
+- [x] Profile
 
 <!-- See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues). -->
 
