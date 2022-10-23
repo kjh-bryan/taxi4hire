@@ -34,10 +34,9 @@ class _BodyState extends State<Body> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () {
-      signInExistingUser(context);
+      UserController.signInExistingUser(context);
     });
   }
 
@@ -73,7 +72,7 @@ class _BodyState extends State<Body> {
                 ),
                 child: Column(
                   children: <Widget>[
-                    Spacer(),
+                    const Spacer(),
                     FadeAnimation(
                       1.5,
                       Row(
@@ -84,7 +83,7 @@ class _BodyState extends State<Body> {
                         ),
                       ),
                     ),
-                    Spacer(flex: 3),
+                    const Spacer(flex: 3),
                     FadeAnimation(
                       1.8,
                       DefaultButton(
@@ -106,7 +105,7 @@ class _BodyState extends State<Body> {
                         },
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 ),
               ),
@@ -120,11 +119,11 @@ class _BodyState extends State<Body> {
   AnimatedContainer buildDot(int index) {
     return AnimatedContainer(
       duration: kAnimationDuration,
-      margin: EdgeInsets.only(right: 5),
+      margin: const EdgeInsets.only(right: 5),
       height: 6,
       width: currentPage == index ? 20 : 6,
       decoration: BoxDecoration(
-        color: currentPage == index ? kPrimaryColor : Color(0xFFD8D8D8),
+        color: currentPage == index ? kPrimaryColor : const Color(0xFFD8D8D8),
         borderRadius: BorderRadius.circular(3),
       ),
     );
@@ -144,7 +143,7 @@ class SplashContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Spacer(),
+        const Spacer(),
         FadeAnimation(
           1.3,
           Text(
@@ -160,10 +159,10 @@ class SplashContent extends StatelessWidget {
           1.5,
           Text(
             text,
-            style: TextStyle(fontWeight: FontWeight.w500),
+            style: const TextStyle(fontWeight: FontWeight.w500),
           ),
         ),
-        Spacer(),
+        const Spacer(),
         FadeAnimation(
           1.7,
           Image.asset(

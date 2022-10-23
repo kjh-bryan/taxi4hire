@@ -9,15 +9,15 @@ class SignUpTaxiDriverScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Sign Up"),
+        title: const Text("Sign Up"),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context, false);
           },
-          icon: Icon(Icons.arrow_back_ios_new_rounded),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
-      body: Body(),
+      body: const Body(),
     );
   }
 }

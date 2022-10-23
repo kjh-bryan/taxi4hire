@@ -148,7 +148,7 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                   child: ListView.separated(
                     physics: ClampingScrollPhysics(),
                     itemBuilder: (context, index) {
-                      return PlacePredictionTileDesign(
+                      return PlacePredictionTile(
                         predictedPlaces: placesPredictedList[index],
                       );
                     },

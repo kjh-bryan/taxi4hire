@@ -9,6 +9,7 @@ import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/models/direction_details_info.dart';
 import 'package:taxi4hire/models/directions.dart';
 import 'package:taxi4hire/models/user_model.dart';
+import 'dart:developer' as developer;
 
 class AssistantMethods {
   static String mapApiKey = FlutterConfig.get('MAP_API_KEY');
@@ -31,8 +32,9 @@ class AssistantMethods {
 
       Provider.of<AppInfo>(context, listen: false)
           .updatePickUpLocationAddress(userPickUpAddress);
-      print(
-          "DEBUG : AssistantMethods > searchAddressForGeographicCoordinate > Provider.of<AppInfo>");
+
+      developer.log("requestResponse : " + requestResponse.toString(),
+          name: "Assistant Methods > searchAddressForGeographicCoordinates");
     }
     return humanReadableAddress;
   }
@@ -47,9 +49,15 @@ class AssistantMethods {
     userRef.once().then((snap) {
       if (snap.snapshot.value != null) {
         userModelCurrentInfo = UserModel.fromSnapshot(snap.snapshot);
-        print("Email : " + userModelCurrentInfo!.email.toString());
-        print("mobile : " + userModelCurrentInfo!.mobile.toString());
-        print("role : " + userModelCurrentInfo!.role.toString());
+
+        developer.log("Email : " + userModelCurrentInfo!.email.toString(),
+            name: "Assistant Methods > readCurrentOnlineUserInfo");
+
+        developer.log("mobile : " + userModelCurrentInfo!.mobile.toString(),
+            name: "Assistant Methods > readCurrentOnlineUserInfo");
+
+        developer.log("role : " + userModelCurrentInfo!.role.toString(),
+            name: "Assistant Methods > readCurrentOnlineUserInfo");
       }
     });
 
@@ -66,29 +74,30 @@ class AssistantMethods {
         urlOriginToDestinationDirectionDetails);
 
     if (responseDirectionApi == "error_occured") {
-      print(
-          "DEBUG : AssistantMethods > obtainOriginToDestinationDirection > responseDirectionApi == 'error_occured'");
+      developer.log("responseDirectionApi == 'error_occured'",
+          name: "Assistant Methods > obtainOriginToDestinationDirection");
       return null;
     }
-    print(
-        "DEBUG : AssistantMethods > obtainOriginToDestinationDirection > Successful");
-    print(
-        "DEBUG : AssistantMethods > obtainOriginToDestinationDirection > Successful > User : " +
-            userModelCurrentInfo!.name!);
+
+    developer.log(
+        "responseDirectionApi > Sucessfull > User : " +
+            userModelCurrentInfo!.name!,
+        name: "Assistant Methods > obtainOriginToDestinationDirection");
+    developer.log(
+        "responseDirectionApi > Sucessfull > User > Response api" +
+            responseDirectionApi.toString(),
+        name: "Assistant Methods > obtainOriginToDestinationDirection");
     DirectionDetailsInfo directionDetailsInfo = DirectionDetailsInfo();
 
-    print(
-        "DEBUG : AssistantMethods > obtainOriginToDestinationDirection > Successful > User : > Response api " +
-            responseDirectionApi.toString());
-    directionDetailsInfo.e_points =
+    directionDetailsInfo.ePoints =
         responseDirectionApi["routes"][0]["overview_polyline"]["points"];
-    directionDetailsInfo.distance_text =
+    directionDetailsInfo.distanceText =
         responseDirectionApi["routes"][0]["legs"][0]["distance"]["text"];
-    directionDetailsInfo.distance_value =
+    directionDetailsInfo.distanceValue =
         responseDirectionApi["routes"][0]["legs"][0]["distance"]["value"];
-    directionDetailsInfo.duration_text =
+    directionDetailsInfo.durationText =
         responseDirectionApi["routes"][0]["legs"][0]["duration"]["text"];
-    directionDetailsInfo.duration_value =
+    directionDetailsInfo.durationValue =
         responseDirectionApi["routes"][0]["legs"][0]["duration"]["value"];
 
     return directionDetailsInfo;
@@ -101,13 +110,14 @@ class AssistantMethods {
         type.toLowerCase() == "standard" ? 0.24 : 0.33;
 
     double timeTraveledFarePerMinute =
-        (directionDetailsInfo.duration_value! / 45) * feesPerDistanceDuration;
+        (directionDetailsInfo.durationValue! / 45) * feesPerDistanceDuration;
 
     double distanceTraveledFareAmountPerKilometer =
-        (directionDetailsInfo.distance_value! / 400) * feesPerDistanceDuration;
+        (directionDetailsInfo.distanceValue! / 400) * feesPerDistanceDuration;
 
-    double totalFareAmount =
-        bookingFees + distanceTraveledFareAmountPerKilometer;
+    double totalFareAmount = bookingFees +
+        distanceTraveledFareAmountPerKilometer +
+        timeTraveledFarePerMinute;
 
     return double.parse(totalFareAmount.toStringAsFixed(2));
   }

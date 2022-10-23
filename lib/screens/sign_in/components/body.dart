@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:taxi4hire/animation/FadeAnimation.dart';
 import 'package:taxi4hire/components/no_account_text.dart';
 import 'package:taxi4hire/constants.dart';
-import 'package:taxi4hire/screens/forget_password/forget_password_screen.dart';
 import 'package:taxi4hire/screens/sign_in/components/sign_in_form.dart';
 import 'package:taxi4hire/size_config.dart';
 

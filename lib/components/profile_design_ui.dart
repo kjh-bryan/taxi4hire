@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:taxi4hire/constants.dart';
 
 class ProfileDesignUIWidget extends StatefulWidget {
-  String? textInfo;
-  IconData? iconData;
-  ProfileDesignUIWidget({Key? key, this.textInfo, this.iconData})
+  final String textInfo;
+  final IconData iconData;
+  const ProfileDesignUIWidget(
+      {Key? key, required this.textInfo, required this.iconData})
       : super(key: key);
 
   @override
@@ -15,7 +16,7 @@ class _ProfileDesignUIWidgetState extends State<ProfileDesignUIWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(20)),
         side: BorderSide(color: kPrimaryColor),
       ),
@@ -27,8 +28,8 @@ class _ProfileDesignUIWidgetState extends State<ProfileDesignUIWidget> {
           color: kPrimaryColor,
         ),
         title: Text(
-          widget.textInfo!,
-          style: TextStyle(
+          widget.textInfo,
+          style: const TextStyle(
             color: kPrimaryColor,
             fontSize: 16,
             fontWeight: FontWeight.w500,

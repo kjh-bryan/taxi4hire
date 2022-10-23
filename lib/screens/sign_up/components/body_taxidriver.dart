@@ -149,8 +149,14 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 // Go to Login Page
-                signUpUser(context, emailController, passwordController,
-                    nameController, mobileNoController, licenseNoController, 0);
+                UserController.signUpUser(
+                    context,
+                    emailController,
+                    passwordController,
+                    nameController,
+                    mobileNoController,
+                    licenseNoController,
+                    0);
               }
             },
           ),

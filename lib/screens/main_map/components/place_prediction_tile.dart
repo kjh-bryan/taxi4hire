@@ -8,17 +8,18 @@ import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/models/directions.dart';
 import 'package:taxi4hire/models/predicted_places.dart';
 import 'package:taxi4hire/size_config.dart';
+import 'dart:developer' as developer;
 
-class PlacePredictionTileDesign extends StatelessWidget {
+class PlacePredictionTile extends StatelessWidget {
   final PredictedPlaces? predictedPlaces;
 
-  PlacePredictionTileDesign({this.predictedPlaces});
+  const PlacePredictionTile({Key? key, this.predictedPlaces}) : super(key: key);
 
   getPlaceDirectionDetails(String? placeId, context) async {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => ProgressDialog(
+      builder: (BuildContext context) => const ProgressDialog(
         message: "Setting up drop off location",
       ),
     );
@@ -31,24 +32,32 @@ class PlacePredictionTileDesign extends StatelessWidget {
 
     Navigator.pop(context);
     if (responsePlaceId == "error_occured") {
+      developer.log("responsePlaceId == 'error_occured'",
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
       return;
     }
 
     if (responsePlaceId["status"] == "OK") {
-      Directions directions = new Directions();
+      Directions directions = Directions();
       directions.locationName = responsePlaceId["result"]["name"];
       directions.locationLatitude =
           responsePlaceId["result"]["geometry"]["location"]["lat"];
       directions.locationLongitude =
           responsePlaceId["result"]["geometry"]["location"]["lng"];
       directions.locationId = placeId;
+      developer.log("responsePlaceId['status'] == 'OK'",
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
 
-      print(
-          "\nDEBUG : place_prediction_tile > getPlaceDirectionDetails > responsePlaceId['status'] == 'OK' ");
+      developer.log("Location Name : " + directions.locationName!,
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
 
-      print("\nLocation name = " + directions.locationName!);
-      print("\nLocation lat = " + directions.locationLatitude!.toString());
-      print("\nLocation long = " + directions.locationLongitude!.toString());
+      developer.log(
+          "Location Latitude : " + directions.locationLatitude!.toString(),
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
+
+      developer.log(
+          "Location Longitude : " + directions.locationLongitude!.toString(),
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
 
       Provider.of<AppInfo>(context, listen: false)
           .updateDropOffLocationAddress(directions);
@@ -62,7 +71,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
     return ElevatedButton(
       onPressed: () {
         FocusScope.of(context).unfocus();
-        getPlaceDirectionDetails(predictedPlaces!.place_id, context);
+        getPlaceDirectionDetails(predictedPlaces!.placeId, context);
       },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
@@ -83,7 +92,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                     height: getProportionateScreenHeight(8),
                   ),
                   Text(
-                    predictedPlaces!.main_text!,
+                    predictedPlaces!.mainPlaceDescriptionText!,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: getProportionateScreenWidth(16),
@@ -94,7 +103,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                     height: getProportionateScreenHeight(2),
                   ),
                   Text(
-                    predictedPlaces!.secondary_text!,
+                    predictedPlaces!.secondaryPlaceDescriptionText!,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: getProportionateScreenWidth(12),

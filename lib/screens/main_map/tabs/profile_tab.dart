@@ -26,16 +26,16 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
           children: [
             const Text(
               "Profile",
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 50,
                 color: kPrimaryColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18.0),
-              child: const SizedBox(
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 18.0),
+              child: SizedBox(
                 height: 20,
                 child: Divider(
                   color: Colors.grey,
@@ -78,27 +78,19 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
             //User's phone
 
             ProfileDesignUIWidget(
-              textInfo: userModelCurrentInfo!.mobile,
+              textInfo: userModelCurrentInfo!.mobile!,
               iconData: Icons.phone_android,
             ),
 
             //User's email
             ProfileDesignUIWidget(
-              textInfo: userModelCurrentInfo!.email,
+              textInfo: userModelCurrentInfo!.email!,
               iconData: Icons.email,
             ),
 
-            // User's role :
-            // ProfileDesignUIWidget(
-            //   textInfo:
-            //       (userModelCurrentInfo!.role == 0) ? "Driver" : "Passenger",
-            //   iconData: (userModelCurrentInfo!.role == 0)
-            //       ? Icons.local_taxi
-            //       : Icons.hail,
-            // ),
             (userModelCurrentInfo!.role == "0")
                 ? ProfileDesignUIWidget(
-                    textInfo: userModelCurrentInfo!.license_plate,
+                    textInfo: userModelCurrentInfo!.licensePlate!,
                     iconData: Icons.numbers,
                   )
                 : Container(),

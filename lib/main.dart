@@ -1,11 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/routes.dart';
 import 'package:taxi4hire/screens/splash/splash_screen.dart';
@@ -37,7 +34,7 @@ void main() async {
 class MyApp extends StatefulWidget {
   final Widget? child;
 
-  MyApp({this.child});
+  const MyApp({Key? key, this.child}) : super(key: key);
 
   static void restartApp(BuildContext context) {
     context.findAncestorStateOfType<_MyAppState>()!.restartApp();
@@ -58,7 +55,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
     ));
     return KeyedSubtree(

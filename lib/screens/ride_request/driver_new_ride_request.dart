@@ -69,7 +69,7 @@ class _DriverNewRideRequestScreenState
     databaseReference.child("driverPhone").set(userModelCurrentInfo!.mobile);
     databaseReference
         .child("driverLicensePlate")
-        .set(userModelCurrentInfo!.license_plate);
+        .set(userModelCurrentInfo!.licensePlate);
   }
 
   Future<void> drawPolyLineFromSourceToDestination(
@@ -89,7 +89,7 @@ class _DriverNewRideRequestScreenState
 
     PolylinePoints pPoints = PolylinePoints();
     List<PointLatLng> decodedPolyLinePointsResultList =
-        pPoints.decodePolyline(directionDetailsInfo!.e_points!);
+        pPoints.decodePolyline(directionDetailsInfo!.ePoints!);
 
     polyLinePositionCoordinates.clear();
 
@@ -245,7 +245,7 @@ class _DriverNewRideRequestScreenState
         if (mounted) {
           setState(() {
             durationFromSourceToDestination =
-                directionInformation.duration_text!;
+                directionInformation.durationText!;
           });
         }
       }

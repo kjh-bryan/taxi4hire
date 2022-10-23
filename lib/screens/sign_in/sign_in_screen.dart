@@ -43,7 +43,7 @@ class _SignInScreenState extends State<SignInScreen> {
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      signInExistingUser(context);
+      UserController.signInExistingUser(context);
     });
     // startTime();
   }

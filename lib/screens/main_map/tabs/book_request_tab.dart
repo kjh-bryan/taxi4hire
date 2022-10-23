@@ -21,7 +21,6 @@ import 'package:taxi4hire/main.dart';
 import 'package:taxi4hire/models/direction_details_info.dart';
 import 'package:taxi4hire/models/taxi_type_list.dart';
 import 'package:taxi4hire/models/user_model.dart';
-import 'package:taxi4hire/screens/main_map/components/booking_request_panel_widget.dart';
 import 'package:taxi4hire/screens/main_map/components/search_places_screen.dart';
 import 'package:taxi4hire/screens/main_map/widget/current_location_data.dart';
 import 'package:taxi4hire/screens/main_map/widget/inherited_widget.dart';
@@ -149,11 +148,11 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     Navigator.pop(context);
     print("\nDEBUG : home_tab > drawPolyLineFromSourceToDestination\n");
     print("\nDEBUG :These are the points = ");
-    print("\nDEBUG :" + directionDetailsInfo!.e_points.toString());
+    print("\nDEBUG :" + directionDetailsInfo!.ePoints.toString());
 
     PolylinePoints pPoints = PolylinePoints();
     List<PointLatLng> decodedPolyLinePointsResultList =
-        pPoints.decodePolyline(directionDetailsInfo.e_points!);
+        pPoints.decodePolyline(directionDetailsInfo.ePoints!);
 
     pLineCoordinatesList.clear();
 
@@ -174,15 +173,15 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     TaxiTypeList tPremium = TaxiTypeList(
         imgUrl: "assets/images/premium.png",
         type: "Premium",
-        distance: directionDetailsInfo.distance_text,
-        duration: directionDetailsInfo.duration_text,
+        distance: directionDetailsInfo.distanceText,
+        duration: directionDetailsInfo.durationText,
         price: premiumPrice.toString());
 
     TaxiTypeList tStandard = TaxiTypeList(
         imgUrl: "assets/images/standard.png",
         type: "Standard",
-        distance: directionDetailsInfo.distance_text,
-        duration: directionDetailsInfo.duration_text,
+        distance: directionDetailsInfo.distanceText,
+        duration: directionDetailsInfo.durationText,
         price: standardPrice.toString());
     polyLineSet.clear();
 
@@ -279,8 +278,8 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
   }
 
   requestARideButton() {
-    referenceRideRequest =
-        bookRideRequest(referenceRideRequest, context, taxiList[selectedTaxi]);
+    referenceRideRequest = BookingController.bookRideRequest(
+        referenceRideRequest, context, taxiList[selectedTaxi]);
 
     userReference = FirebaseDatabase.instance
         .ref()
@@ -326,7 +325,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
 
         if ((event.snapshot.value as Map)["driverLicensePlate"] != null) {
           setState(() {
-            yourDriverCurrentInfo!.license_plate =
+            yourDriverCurrentInfo!.licensePlate =
                 (event.snapshot.value as Map)["driverLicensePlate"].toString();
           });
         }
@@ -457,7 +456,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
 
       setState(() {
         driverRideStatus = "Taxi is arriving in " +
-            directionDetailsInfo.duration_text.toString();
+            directionDetailsInfo.durationText.toString();
       });
 
       requestPositionInfo = true;
@@ -485,7 +484,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
 
       setState(() {
         driverRideStatus = "Reaching destination in " +
-            directionDetailsInfo.duration_text.toString();
+            directionDetailsInfo.durationText.toString();
       });
 
       requestPositionInfo = true;
@@ -541,9 +540,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
                 setState(() {
                   bottomPadding = 30;
                 });
-                Provider.of<AppInfo>(context, listen: false)
-                    .setBookingRequestPageMapController(
-                        newGoogleMapController!);
+
                 locateUserPosition();
               },
             ),
@@ -971,7 +968,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
                             ),
                             // Taxi Driver License Plate
                             Text(
-                              yourDriverCurrentInfo!.license_plate!,
+                              yourDriverCurrentInfo!.licensePlate!,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 25,

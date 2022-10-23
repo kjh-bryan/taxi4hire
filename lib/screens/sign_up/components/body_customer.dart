@@ -146,8 +146,14 @@ class _SignUpCustomerFormState extends State<SignUpCustomerForm> {
             press: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                signUpUser(context, emailController, passwordController,
-                    nameController, mobileNoController, null, 1);
+                UserController.signUpUser(
+                    context,
+                    emailController,
+                    passwordController,
+                    nameController,
+                    mobileNoController,
+                    null,
+                    1);
                 // Go to Login Page
               }
             },

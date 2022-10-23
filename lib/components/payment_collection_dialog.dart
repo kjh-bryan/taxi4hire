@@ -35,7 +35,7 @@ class _PaymentCollectionDialogState extends State<PaymentCollectionDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 20),
-            Text(
+            const Text(
               "Your Earnings Amount",
               style: TextStyle(
                 fontSize: 22,

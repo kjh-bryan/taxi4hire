@@ -1,8 +1,7 @@
 import 'dart:convert';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_config/flutter_config.dart';
+import 'dart:developer' as developer;
 
 class RequestAssistant {
   static Future<dynamic> receiveRequest(String url) async {
@@ -16,13 +15,14 @@ class RequestAssistant {
 
         return decodeResponseData;
       } else {
-        print("Error occured in request_assistant - > receiveRequest");
         return "error_occured";
       }
     } catch (ex) {
-      print(
+      developer.log(
           "Error occured in request_assistant - > receiveRequest -> try catch " +
-              ex.toString());
+              ex.toString(),
+          name: "RequestAssistant");
+
       return "error_occured";
     }
   }

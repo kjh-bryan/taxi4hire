@@ -1,15 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/controller/booking_controller.dart';
-import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/models/user_ride_request.dart';
-import 'package:taxi4hire/screens/ride_request/driver_new_ride_request.dart';
 
 class BookingRequestsTabPage extends StatefulWidget {
   const BookingRequestsTabPage({Key? key}) : super(key: key);
@@ -19,23 +13,23 @@ class BookingRequestsTabPage extends StatefulWidget {
 }
 
 class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
-  final ride_request_reference = FirebaseDatabase.instance.ref("ride_request");
+  // Get Firebase Instance that shows all childs of ride_request
+  final rideRequestReference = FirebaseDatabase.instance.ref("ride_request");
 
-  List<UserRideRequest> _userRideRequestList = [];
-
-  bool _tileExpanded = false;
-  int _expandedTile = -1;
-
+  final List<UserRideRequest> _userRideRequestList = [];
+  bool tileExpanded = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    ride_request_reference.onChildAdded.listen(_childAdded);
-    ride_request_reference.onChildRemoved.listen(_childRemoved);
-    ride_request_reference.onChildChanged.listen(_childChanged);
+    //Add listening events whenever child is added, removed or changed;
+    rideRequestReference.onChildAdded.listen(_childAdded);
+    rideRequestReference.onChildRemoved.listen(_childRemoved);
+    rideRequestReference.onChildChanged.listen(_childChanged);
   }
 
   _childAdded(DatabaseEvent event) {
+    //Add to list if child was added to ride_request (Passenger request a ride)
     if (event.snapshot.child("driverId").value == "waiting") {
       setState(() {
         _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
@@ -44,6 +38,7 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
   }
 
   _childRemoved(DatabaseEvent event) {
+    //Remove from list if child was removed in ride_request (Passenger cancelled ride)
     var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
       return rideRequest.rideRequestId == event.snapshot.key;
     });
@@ -54,7 +49,7 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
   }
 
   _childChanged(DatabaseEvent event) {
-    print("DEBUG : CHILDCHANGED");
+    //Handle event when child of ride_request was changed (Ride Request status changed)
     if (event.snapshot.child("driverId").value == "waiting") {
       setState(() {
         _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
@@ -91,19 +86,23 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                 ),
               )
             : FirebaseAnimatedList(
-                query: ride_request_reference
+                query: rideRequestReference
                     .orderByChild("driverId")
                     .equalTo("waiting"),
                 itemBuilder: (context, snapshot, animation, index) {
                   return Card(
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      side: BorderSide(color: Colors.grey),
+                    ),
                     elevation: 4,
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18.0, vertical: 10.0),
                       child: ExpansionTile(
                         iconColor: kPrimaryColor,
                         collapsedBackgroundColor: Colors.grey[200],
-                        childrenPadding: EdgeInsets.symmetric(
+                        childrenPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                         ),
                         title: Text(
@@ -112,11 +111,17 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                                   .child("destinationAddress")
                                   .value
                                   .toString(),
-                          style: TextStyle(color: kPrimaryColor),
+                          style: const TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 18,
+                          ),
                         ),
                         subtitle: Text(
                           "From: " +
                               snapshot.child("sourceAddress").value.toString(),
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
                         ),
                         expandedCrossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -126,35 +131,95 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                                     .child("sourceAddress")
                                     .value
                                     .toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: kPrimaryColor,
+                            ),
                           ),
-                          Text("Distance: " +
-                              snapshot.child("distance").value.toString()),
-                          Text("Duration: " +
-                              snapshot.child("duration").value.toString()),
-                          Text("Estimated Earnings: S\$" +
-                              snapshot.child("price").value.toString()),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Distance: " +
+                                snapshot.child("distance").value.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: kPrimaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Duration: " +
+                                snapshot.child("duration").value.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: kPrimaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Estimated Earnings: S\$" +
+                                snapshot.child("price").value.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: kPrimaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(
+                              const Text(
                                 "Accept",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: kPrimaryColor,
+                                ),
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  acceptRideRequest(
-                                      context,
-                                      snapshot.child("userId").value.toString(),
-                                      snapshot.key!);
-                                },
-                                icon: const Icon(Icons.check,
-                                    color: kPrimaryColor),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Container(
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  color: kPrimaryColor,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      spreadRadius: 2,
+                                      blurRadius: 2,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    BookingController().acceptRideRequest(
+                                        context,
+                                        snapshot
+                                            .child("userId")
+                                            .value
+                                            .toString(),
+                                        snapshot.key!);
+                                  },
+                                  icon: const Icon(Icons.check,
+                                      color: Colors.white),
+                                ),
                               ),
                             ],
-                          )
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
                         ],
                         onExpansionChanged: (bool expanded) {
                           setState(() {
-                            _tileExpanded = expanded;
+                            tileExpanded = expanded;
                           });
                         },
                       ),

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:taxi4hire/assistants/assistant_methods.dart';
-import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/global/global.dart';
-import 'package:taxi4hire/models/user_model.dart';
 import 'package:taxi4hire/screens/main_map/tabs/book_request_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/booking_requests_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/home_tab.dart';
@@ -23,9 +20,6 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
   TabController? tabController;
   int selectedIndex = 0;
   var geoLocation = Geolocator();
-
-  @override
-  bool get wantKeepAlive => true;
 
   onItemClicked(int index) {
     setState(() {
@@ -55,14 +49,14 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: TabBarView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
         children: [
-          HomeTabPage(),
+          const HomeTabPage(),
           (userModelCurrentInfo!.role.toString() == "0")
-              ? BookingRequestsTabPage()
-              : BookRequestsTabPage(),
-          ProfileTabPage(),
+              ? const BookingRequestsTabPage()
+              : const BookRequestsTabPage(),
+          const ProfileTabPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -86,14 +80,18 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
           ),
         ],
         landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
-        unselectedLabelStyle: TextStyle(),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w400,
+        ),
         unselectedItemColor: Colors.white54,
         selectedItemColor: Colors.white,
         backgroundColor: kPrimaryColor,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: TextStyle(
-          fontSize: getProportionateScreenWidth(11),
+          fontSize: getProportionateScreenWidth(12),
+          fontWeight: FontWeight.bold,
         ),
+        selectedFontSize: getProportionateScreenWidth(12),
         unselectedFontSize: getProportionateScreenWidth(10),
         currentIndex: selectedIndex,
         onTap: onItemClicked,
