@@ -33,55 +33,59 @@ class _HomeTabPageState extends State<HomeTabPage>
 
   var geoLocator = Geolocator();
 
+  Timer? _timer;
+
   Future<void> getTaxiAvailability() async {
-    // markersSet.clear();
-    if (markersSet == null) {
-      BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(),
-        "assets/images/car.png",
-      );
+    print("Debug : getTaxiAvailability");
+    BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(),
+      "assets/images/car.png",
+    );
+    var url = Uri.https('api.data.gov.sg', '/v1/transport/taxi-availability');
+
+    // Await the http get response, then decode the json-formatted response.
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      print("Debug : getTaxiAvailability > updating Markers");
+      Set<Marker> newMarkerSet = {};
       print(
-          "\nDEBUG : home_tab > getTaxiAvailability > await BitmapDescriptor");
-      var url = Uri.https('api.data.gov.sg', '/v1/transport/taxi-availability');
+          "\nDEBUG : home_tab > getTaxiAvailability > response.statusCode == 200");
+      var jsonResponse =
+          convert.jsonDecode(response.body) as Map<String, dynamic>;
+      List<dynamic> features =
+          jsonResponse["features"][0]["geometry"]["coordinates"];
 
-      // Await the http get response, then decode the json-formatted response.
-      var response = await http.get(url);
-      if (response.statusCode == 200) {
-        var jsonResponse =
-            convert.jsonDecode(response.body) as Map<String, dynamic>;
-        List<dynamic> features =
-            jsonResponse["features"][0]["geometry"]["coordinates"];
+      for (var i = 0; i < features.length; i++) {
+        Marker marker = Marker(
+          markerId: MarkerId("Taxi - " + i.toString()),
+          position: LatLng(
+            double.parse(features[i][1].toString()),
+            double.parse(features[i][0].toString()),
+          ),
+          infoWindow: InfoWindow(
+            title: "Taxi - " + i.toString(),
+          ),
+          icon: markerbitmap,
+        );
 
-        for (var i = 0; i < features.length; i++) {
-          Marker marker = Marker(
-            markerId: MarkerId("Taxi - " + i.toString()),
-            position: LatLng(
-              double.parse(features[i][1].toString()),
-              double.parse(features[i][0].toString()),
-            ),
-            infoWindow: InfoWindow(
-              title: "Taxi - " + i.toString(),
-            ),
-            icon: markerbitmap,
-          );
-
-          setState(() {
-            markersSet.add(marker);
-          });
-        }
-
-        Provider.of<AppInfo>(context, listen: false)
-            .updateTaxiMarkerSets(markersSet);
-
-        print('\nDEBUG :Printing  Map <markers> -> ' + markersSet.toString());
-      } else {
-        print('\nDEBUG :Request failed with status: ${response.statusCode}.');
+        newMarkerSet.add(marker);
       }
 
-      print("\nDEBUG : home_tab > getTaxiAvailabilty > Print ModalRoute > " +
-          ModalRoute.of(context)!.settings.name.toString());
-      Navigator.pop(context);
-    } else {}
+      setState(() {
+        markersSet.clear();
+        markersSet = newMarkerSet;
+      });
+
+      Provider.of<AppInfo>(context, listen: false)
+          .updateTaxiMarkerSets(markersSet);
+
+      print('\nDEBUG :Printing  Map <markers> -> ' + markersSet.toString());
+    } else {
+      print('\nDEBUG :Request failed with status: ${response.statusCode}.');
+    }
+
+    print("\nDEBUG : home_tab > getTaxiAvailabilty > Print ModalRoute > " +
+        ModalRoute.of(context)!.settings.name.toString());
   }
 
   updateLiveLocationAtRealTime() {
@@ -92,7 +96,9 @@ class _HomeTabPageState extends State<HomeTabPage>
       LatLng latLngLivePosition =
           LatLng(userCurrentLocation!.latitude, userCurrentLocation!.longitude);
 
-      if(mounted) newGoogleMapController!.animateCamera(CameraUpdate.newLatLng(latLngLivePosition));
+      if (mounted)
+        newGoogleMapController!
+            .animateCamera(CameraUpdate.newLatLng(latLngLivePosition));
     });
   }
 
@@ -146,6 +152,7 @@ class _HomeTabPageState extends State<HomeTabPage>
     var destinationLatLng = LatLng(destinationPosition!.locationLatitude!,
         destinationPosition.locationLongitude!);
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => ProgressDialog(
         message: "Please wait...",
@@ -159,32 +166,19 @@ class _HomeTabPageState extends State<HomeTabPage>
     print("These are the points = ");
     print(directionDetailsInfo!.e_points);
   }
-  // void getPolyPoints() async {
-  //   PolylinePoints polylinePoints = PolylinePoints();
-
-  //   if (sourceDestinationMap != null) {
-  //     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-  //       FlutterConfig.get('MAP_API_KEY'),
-  //       PointLatLng(sourceDestinationMap!.sourceLocation.latitude,
-  //           sourceDestinationMap!.sourceLocation.longitude),
-  //       PointLatLng(sourceDestinationMap!.destinationLocation.latitude,
-  //           sourceDestinationMap!.destinationLocation.longitude),
-  //     );
-
-  //     if (result.points.isNotEmpty) {
-  //       result.points.forEach(
-  //         (PointLatLng point) => polylineCoordinates.add(
-  //           LatLng(point.latitude, point.longitude),
-  //         ),
-  //       );
-  //       setState(() {});
-  //     }
-  //   }
-  // }
 
   @override
   void initState() {
     super.initState();
+    // getTaxiAvailability();
+    // _timer = new Timer.periodic(
+    //     const Duration(seconds: 60), (_) => getTaxiAvailability());
+  }
+
+  @override
+  void dispose() {
+    //_timer!.cancel();
+    super.dispose();
   }
 
   @override
