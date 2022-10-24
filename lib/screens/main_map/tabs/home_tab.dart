@@ -5,16 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/map_controller.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
 import 'dart:developer' as developer;
 
 class HomeTabPage extends StatefulWidget {
-  const HomeTabPage({Key? key}) : super(key: key);
+  final int tabNumber;
+  const HomeTabPage({Key? key, required this.tabNumber}) : super(key: key);
 
   @override
   State<HomeTabPage> createState() => _HomeTabPageState();
@@ -32,56 +33,6 @@ class _HomeTabPageState extends State<HomeTabPage>
 
   Timer? _timer;
 
-  Future<void> getTaxiAvailability() async {
-    developer.log("getTaxiAvailability() was called", name: "HomeTabPage");
-    BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(),
-      "assets/images/car.png",
-    );
-    var url = Uri.https('api.data.gov.sg', '/v1/transport/taxi-availability');
-
-    // Await the http get response, then decode the json-formatted response.
-    var response = await http.get(url);
-    if (response.statusCode == 200) {
-      developer.log("response.statusCode == 200",
-          name: "HomeTabPage > getTaxiAvailability()");
-      Set<Marker> newMarkerSet = {};
-      var jsonResponse =
-          convert.jsonDecode(response.body) as Map<String, dynamic>;
-      List<dynamic> features =
-          jsonResponse["features"][0]["geometry"]["coordinates"];
-
-      for (var i = 0; i < features.length; i++) {
-        Marker marker = Marker(
-          markerId: MarkerId("Taxi - " + i.toString()),
-          position: LatLng(
-            double.parse(features[i][1].toString()),
-            double.parse(features[i][0].toString()),
-          ),
-          infoWindow: InfoWindow(
-            title: "Taxi - " + i.toString(),
-          ),
-          icon: markerbitmap,
-        );
-
-        newMarkerSet.add(marker);
-      }
-
-      developer.log("Updating Markers",
-          name: "HomeTabPage > getTaxiAvailability()");
-      setState(() {
-        markersSet.clear();
-        markersSet = newMarkerSet;
-      });
-
-      Provider.of<AppInfo>(context, listen: false)
-          .updateTaxiMarkerSets(markersSet);
-    } else {
-      developer.log("Request failed with status: ${response.statusCode}.",
-          name: "HomeTabPage > getTaxiAvailability()");
-    }
-  }
-
   updateLiveLocationAtRealTime() {
     streamSubscriptionLivePosition =
         Geolocator.getPositionStream().listen((Position position) {
@@ -90,10 +41,10 @@ class _HomeTabPageState extends State<HomeTabPage>
       LatLng latLngLivePosition =
           LatLng(userCurrentLocation!.latitude, userCurrentLocation!.longitude);
 
-      if (mounted) {
-        newGoogleMapController!
-            .animateCamera(CameraUpdate.newLatLng(latLngLivePosition));
-      }
+      // if (mounted) {
+      //   newGoogleMapController!
+      //       .animateCamera(CameraUpdate.newLatLng(latLngLivePosition));
+      // }
     });
   }
 
@@ -170,17 +121,52 @@ class _HomeTabPageState extends State<HomeTabPage>
         name: "HomeTabPage > drawPolyLineFromSourceToDestination");
   }
 
+  periodicUpdateMarkerSetState() async {
+    developer.log("get final int tabNumber : " + widget.tabNumber.toString(),
+        name: "Home Tab > peridoicUpdateMarkerSetState");
+    developer.log(
+        "newMarkers = await MapController.updateTaxiAvailabity(markersSet)",
+        name: "Home Tab > peridoicUpdateMarkerSetState");
+    Set<Marker> newMarkers =
+        await MapController.updateTaxiAvailabity(markersSet);
+
+    developer.log("await done from MapController",
+        name: "Home Tab > peridoicUpdateMarkerSetState");
+    if (Provider.of<AppInfo>(context, listen: false).tabNumber == 0) {
+      setState(() {
+        markersSet = newMarkers;
+        developer.log("Settings newMarkers to markerSet in SetState",
+            name: "Home Tab > peridoicUpdateMarkerSetState");
+      });
+    }
+  }
+
+  setUpTaxiStandAndTaxiMarker() async {
+    Set<Marker> ltaStandMarkerSet = await MapController.readLTATaxiStopJson();
+    Set<Marker> taxiMarkerSet = await MapController.getTaxiAvailability();
+
+    if (Provider.of<AppInfo>(context, listen: false).tabNumber == 0) {
+      setState(() {
+        markersSet = {...ltaStandMarkerSet, ...taxiMarkerSet};
+      });
+    }
+
+    Provider.of<AppInfo>(context, listen: false)
+        .updateTaxiMarkerSets(markersSet);
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      periodicUpdateMarkerSetState();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    // getTaxiAvailability();
-    // _timer = new Timer.periodic(
-    //     const Duration(seconds: 60), (_) => getTaxiAvailability());
+    setUpTaxiStandAndTaxiMarker();
   }
 
   @override
   void dispose() {
-    //_timer!.cancel();
+    _timer!.cancel();
     super.dispose();
   }
 
@@ -190,6 +176,9 @@ class _HomeTabPageState extends State<HomeTabPage>
     return Stack(
       children: [
         GoogleMap(
+          padding: const EdgeInsets.only(
+            bottom: 20,
+          ),
           mapType: MapType.normal,
           myLocationEnabled: true,
           zoomControlsEnabled: true,

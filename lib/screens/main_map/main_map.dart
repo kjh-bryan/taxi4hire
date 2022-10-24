@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/global/global.dart';
+import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/screens/main_map/tabs/book_request_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/booking_requests_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/home_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/profile_tab.dart';
 import 'package:taxi4hire/size_config.dart';
+import 'dart:developer' as developer;
 
 class MainMap extends StatefulWidget {
   static String routeName = "/main_map";
@@ -17,14 +20,14 @@ class MainMap extends StatefulWidget {
 }
 
 class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
-  TabController? tabController;
+  late final tabController = TabController(length: 3, vsync: this);
   int selectedIndex = 0;
   var geoLocation = Geolocator();
 
   onItemClicked(int index) {
     setState(() {
       selectedIndex = index;
-      tabController!.index = selectedIndex;
+      tabController.index = selectedIndex;
     });
   }
 
@@ -42,7 +45,20 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     checkIfLocationPermissionAllowed();
-    tabController = TabController(length: 3, vsync: this);
+    tabController.addListener(() {
+      developer.log(
+          "printing tabController listner " + tabController.index.toString(),
+          name: "Main Map");
+
+      Provider.of<AppInfo>(context, listen: false)
+          .updateTabIndex(tabController.index);
+    });
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,7 +68,7 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
         physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
         children: [
-          const HomeTabPage(),
+          HomeTabPage(tabNumber: tabController.index),
           (userModelCurrentInfo!.role.toString() == "0")
               ? const BookingRequestsTabPage()
               : const BookRequestsTabPage(),

@@ -22,9 +22,11 @@ import 'package:taxi4hire/models/direction_details_info.dart';
 import 'package:taxi4hire/models/taxi_type_list.dart';
 import 'package:taxi4hire/models/user_model.dart';
 import 'package:taxi4hire/screens/main_map/components/search_places_screen.dart';
-import 'package:taxi4hire/screens/main_map/widget/current_location_data.dart';
-import 'package:taxi4hire/screens/main_map/widget/inherited_widget.dart';
 import 'package:taxi4hire/size_config.dart';
+
+import 'dart:developer' as developer;
+
+import 'package:url_launcher/url_launcher.dart';
 
 class BookRequestsTabPage extends StatefulWidget {
   const BookRequestsTabPage({Key? key}) : super(key: key);
@@ -108,9 +110,8 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     CameraPosition cameraPosition =
         CameraPosition(target: latLngPosition, zoom: 14);
 
-    if (mounted)
-      newGoogleMapController!
-          .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    newGoogleMapController!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
     String humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCoordinates(
@@ -132,7 +133,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => ProgressDialog(
+      builder: (BuildContext context) => const ProgressDialog(
         message: "Please wait...",
       ),
     );
@@ -146,6 +147,8 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
       tripDirectionDetailsInfo = directionDetailsInfo;
     });
     Navigator.pop(context);
+    developer.log("drawPolyLineFromSourceToDestination",
+        name: "BookRequestTab");
     print("\nDEBUG : home_tab > drawPolyLineFromSourceToDestination\n");
     print("\nDEBUG :These are the points = ");
     print("\nDEBUG :" + directionDetailsInfo!.ePoints.toString());
@@ -188,7 +191,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     taxiList.clear();
     setState(() {
       taxiList.add(tStandard);
-      taxiList.add(tPremium);
+      // taxiList.add(tPremium);
 
       Polyline polyline = Polyline(
         color: kPrimaryColor,
@@ -262,7 +265,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     );
 
     Circle destinationCircle = Circle(
-      circleId: CircleId("destinationId"),
+      circleId: const CircleId("destinationId"),
       fillColor: Colors.red,
       radius: 12,
       strokeWidth: 3,
@@ -1004,7 +1007,14 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
                                 width: double.infinity,
                                 height: 50,
                                 child: ElevatedButton.icon(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    final Uri launchUri = Uri(
+                                      scheme: 'tel',
+                                      path: yourDriverCurrentInfo!.mobile,
+                                    );
+
+                                    await launchUrl(launchUri);
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     primary: kPrimaryColor,
                                     shape: RoundedRectangleBorder(

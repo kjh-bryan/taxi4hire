@@ -10,6 +10,7 @@ class AppInfo extends ChangeNotifier {
   Set<Marker>? markersSet;
   List<TaxiTypeList>? taxiList;
   bool requestRideStatus = false;
+  int tabNumber = 0;
 
   void updatePickUpLocationAddress(Directions userPickUpAddress) {
     userPickUpLocation = userPickUpAddress;
@@ -33,6 +34,11 @@ class AppInfo extends ChangeNotifier {
 
   void updateRequestRideStatus(bool newRequestRideStatus) {
     requestRideStatus = newRequestRideStatus;
+    notifyListeners();
+  }
+
+  void updateTabIndex(int newTabNumber) {
+    tabNumber = newTabNumber;
     notifyListeners();
   }
 

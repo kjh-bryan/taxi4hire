@@ -31,9 +31,14 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
   _childAdded(DatabaseEvent event) {
     //Add to list if child was added to ride_request (Passenger request a ride)
     if (event.snapshot.child("driverId").value == "waiting") {
-      setState(() {
+      if (mounted) {
+        setState(() {
+          _userRideRequestList
+              .add(UserRideRequest.fromSnapshot(event.snapshot));
+        });
+      } else {
         _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
-      });
+      }
     }
   }
 
@@ -42,27 +47,32 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
     var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
       return rideRequest.rideRequestId == event.snapshot.key;
     });
-    setState(() {
-      _userRideRequestList
-          .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
-    });
-  }
-
-  _childChanged(DatabaseEvent event) {
-    //Handle event when child of ride_request was changed (Ride Request status changed)
-    if (event.snapshot.child("driverId").value == "waiting") {
-      setState(() {
-        _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
-      });
-    } else {
-      var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
-        return rideRequest.rideRequestId == event.snapshot.key;
-      });
+    if (mounted) {
       setState(() {
         _userRideRequestList
             .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
       });
+    } else {
+      _userRideRequestList
+          .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
     }
+  }
+
+  _childChanged(DatabaseEvent event) {
+    //Handle event when child of ride_request was changed (Ride Request status changed)
+    // if (event.snapshot.child("driverId").value == "waiting") {
+    //   setState(() {
+    //     _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
+    //   });
+    // } else {
+    //   var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
+    //     return rideRequest.rideRequestId == event.snapshot.key;
+    //   });
+    //   setState(() {
+    //     _userRideRequestList
+    //         .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
+    //   });
+    // }
   }
 
   @override

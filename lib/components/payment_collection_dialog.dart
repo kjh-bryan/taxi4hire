@@ -75,11 +75,11 @@ class _PaymentCollectionDialogState extends State<PaymentCollectionDialog> {
                 child: ElevatedButton(
                   onPressed: () {
                     Future.delayed(const Duration(milliseconds: 2), () {
-                      SystemNavigator.pop();
+                      Navigator.pop(context);
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: kPrimaryColor,
+                    backgroundColor: kPrimaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
