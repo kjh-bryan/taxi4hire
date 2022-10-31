@@ -5,9 +5,8 @@ import 'dart:developer' as developer;
 
 class RequestAssistant {
   static Future<dynamic> receiveRequest(String url) async {
-    http.Response httpResponse = await http.get(Uri.parse(url));
-
     try {
+      http.Response httpResponse = await http.get(Uri.parse(url));
       if (httpResponse.statusCode == 200) {
         String responseData = httpResponse.body;
 

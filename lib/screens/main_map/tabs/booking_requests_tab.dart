@@ -25,7 +25,6 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
     //Add listening events whenever child is added, removed or changed;
     rideRequestReference.onChildAdded.listen(_childAdded);
     rideRequestReference.onChildRemoved.listen(_childRemoved);
-    rideRequestReference.onChildChanged.listen(_childChanged);
   }
 
   _childAdded(DatabaseEvent event) {
@@ -56,23 +55,6 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
       _userRideRequestList
           .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
     }
-  }
-
-  _childChanged(DatabaseEvent event) {
-    //Handle event when child of ride_request was changed (Ride Request status changed)
-    // if (event.snapshot.child("driverId").value == "waiting") {
-    //   setState(() {
-    //     _userRideRequestList.add(UserRideRequest.fromSnapshot(event.snapshot));
-    //   });
-    // } else {
-    //   var deletingRideRequest = _userRideRequestList.singleWhere((rideRequest) {
-    //     return rideRequest.rideRequestId == event.snapshot.key;
-    //   });
-    //   setState(() {
-    //     _userRideRequestList
-    //         .removeAt(_userRideRequestList.indexOf(deletingRideRequest));
-    //   });
-    // }
   }
 
   @override
@@ -209,7 +191,7 @@ class _BookingRequestsTabPageState extends State<BookingRequestsTabPage> {
                                 ),
                                 child: IconButton(
                                   onPressed: () {
-                                    BookingController().acceptRideRequest(
+                                    BookingController.acceptRideRequest(
                                         context,
                                         snapshot
                                             .child("userId")

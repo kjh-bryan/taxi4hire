@@ -7,10 +7,7 @@ class UserModel {
   String? mobile;
   String? licensePlate;
   String? role;
-  String? rideStatus;
-
-  bool get isPassengerRole => role == "1";
-  bool get isDriverRole => role == "0";
+  String? rideRequestStatus;
 
   UserModel(
       {this.id,
@@ -19,7 +16,7 @@ class UserModel {
       this.mobile,
       this.licensePlate,
       this.role,
-      this.rideStatus});
+      this.rideRequestStatus});
 
   UserModel.fromSnapshot(DataSnapshot snap) {
     id = snap.key;
@@ -28,7 +25,7 @@ class UserModel {
     name = (snap.value as dynamic)["name"];
     licensePlate = (snap.value as dynamic)["license_plate"];
     role = (snap.value as dynamic)["role"].toString();
-    rideStatus = (snap.value as dynamic)["ride_status"].toString();
+    rideRequestStatus = (snap.value as dynamic)["ride_request"].toString();
   }
 
   // factory User.fromMap(Map<String, dynamic> data) {

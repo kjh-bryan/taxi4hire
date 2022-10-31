@@ -39,27 +39,36 @@ class AssistantMethods {
     return humanReadableAddress;
   }
 
-  static void readCurrentOnlineUserInfo() async {
+  static Future<UserModel?> readCurrentOnlineUserInfo() async {
     currentFirebaseUser = firebaseAuth.currentUser;
     DatabaseReference userRef = FirebaseDatabase.instance
         .ref()
         .child("users")
         .child(currentFirebaseUser!.uid);
 
-    userRef.once().then((snap) {
-      if (snap.snapshot.value != null) {
-        userModelCurrentInfo = UserModel.fromSnapshot(snap.snapshot);
+    final snapShot = await userRef.get();
 
-        developer.log("Email : " + userModelCurrentInfo!.email.toString(),
-            name: "Assistant Methods > readCurrentOnlineUserInfo");
+    if (snapShot.value != null) {
+      userModelCurrentInfo = UserModel.fromSnapshot(snapShot);
+      return userModelCurrentInfo;
+    }
 
-        developer.log("mobile : " + userModelCurrentInfo!.mobile.toString(),
-            name: "Assistant Methods > readCurrentOnlineUserInfo");
+    // userRef.once().then((snap) {
+    //   if (snap.snapshot.value != null) {
+    //     userModelCurrentInfo = UserModel.fromSnapshot(snap.snapshot);
 
-        developer.log("role : " + userModelCurrentInfo!.role.toString(),
-            name: "Assistant Methods > readCurrentOnlineUserInfo");
-      }
-    });
+    //     developer.log("Email : " + userModelCurrentInfo!.email.toString(),
+    //         name: "Assistant Methods > readCurrentOnlineUserInfo");
+
+    //     developer.log("mobile : " + userModelCurrentInfo!.mobile.toString(),
+    //         name: "Assistant Methods > readCurrentOnlineUserInfo");
+
+    //     developer.log("role : " + userModelCurrentInfo!.role.toString(),
+    //         name: "Assistant Methods > readCurrentOnlineUserInfo");
+
+    //     return userModelCurrentInfo;
+    //   }
+    // });
 
     return null;
   }

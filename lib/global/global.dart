@@ -15,4 +15,3 @@ StreamSubscription<Position>? streamSubscriptionRideRequestLivePosition;
 DirectionDetailsInfo? tripDirectionDetailsInfo;
 UserRideRequest? globalRideRequestDetail;
 Position? userCurrentLocation;
-bool rideRequestEnded = false;

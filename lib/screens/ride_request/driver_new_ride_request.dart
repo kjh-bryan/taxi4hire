@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:taxi4hire/assistants/assistant_methods.dart';
@@ -14,6 +15,7 @@ import 'package:taxi4hire/constants.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/main.dart';
 import 'package:taxi4hire/models/user_ride_request.dart';
+import 'dart:developer' as developer;
 
 class DriverNewRideRequestScreen extends StatefulWidget {
   static String routeName = "/driver_new_ride_request";
@@ -47,29 +49,48 @@ class _DriverNewRideRequestScreenState
 
   String rideRequestStatus = "accepted";
   String durationFromSourceToDestination = "";
+  int durationFromSourceToDestinationInt = 0;
 
   bool isRequestDirectionDetail = false;
 
-  assignedDriverToRideRequest() {
+  assignedDriverToRideRequest() async {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("ride_request")
         .child(localRideRequestDetail!.rideRequestId!);
 
+    final databaseStatusReferenceSnapshot =
+        await databaseReference.child("status").get();
     Map driverLocationDataMap = {
       //Original is driverCurrentPosition?
       "latitude": userCurrentLocation!.latitude.toString(),
       "longitude": userCurrentLocation!.longitude.toString()
     };
 
-    databaseReference.child("driverLatLng").set(driverLocationDataMap);
-    databaseReference.child("status").set("accepted");
-    databaseReference.child("driverId").set(userModelCurrentInfo!.id);
-    databaseReference.child("driverName").set(userModelCurrentInfo!.name);
-    databaseReference.child("driverPhone").set(userModelCurrentInfo!.mobile);
-    databaseReference
-        .child("driverLicensePlate")
-        .set(userModelCurrentInfo!.licensePlate);
+    String status = databaseStatusReferenceSnapshot.value.toString();
+    if (status == "accepted") {
+      databaseReference.child("driverLatLng").set(driverLocationDataMap);
+      databaseReference.child("status").set("accepted");
+      databaseReference.child("driverId").set(userModelCurrentInfo!.id);
+      databaseReference.child("driverName").set(userModelCurrentInfo!.name);
+      databaseReference.child("driverPhone").set(userModelCurrentInfo!.mobile);
+      databaseReference
+          .child("driverLicensePlate")
+          .set(userModelCurrentInfo!.licensePlate);
+    } else {
+      rideRequestStatus = status;
+      if (rideRequestStatus == "arrived") {
+        setState(() {
+          buttonTitle = "Start Ride Request";
+          buttonColor = kSecondaryColor;
+        });
+      } else if (rideRequestStatus == "onriderequest") {
+        setState(() {
+          buttonTitle = "End Ride Request";
+          buttonColor = kLavenderBlushColor;
+        });
+      }
+    }
   }
 
   Future<void> drawPolyLineFromSourceToDestination(
@@ -77,7 +98,7 @@ class _DriverNewRideRequestScreenState
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) => ProgressDialog(
+      builder: (BuildContext context) => const ProgressDialog(
         message: "Please wait...",
       ),
     );
@@ -105,7 +126,7 @@ class _DriverNewRideRequestScreenState
     setState(() {
       Polyline polyline = Polyline(
         color: kPrimaryColor,
-        polylineId: PolylineId("PolylineID"),
+        polylineId: PolylineId("Polyline2"),
         jointType: JointType.round,
         points: polyLinePositionCoordinates,
         startCap: Cap.roundCap,
@@ -187,7 +208,7 @@ class _DriverNewRideRequestScreenState
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext c) => ProgressDialog(
+      builder: (BuildContext c) => const ProgressDialog(
         message: "Loading..",
       ),
     );
@@ -246,6 +267,8 @@ class _DriverNewRideRequestScreenState
           setState(() {
             durationFromSourceToDestination =
                 directionInformation.durationText!;
+            durationFromSourceToDestinationInt =
+                directionInformation.durationValue!;
           });
         }
       }
@@ -272,17 +295,17 @@ class _DriverNewRideRequestScreenState
         infoWindow: InfoWindow(title: "Your current location"),
       );
 
+      CameraPosition cameraPosition =
+          CameraPosition(target: latLngDriverPosition, zoom: 15);
       setState(() {
-        CameraPosition cameraPosition =
-            CameraPosition(target: latLngDriverPosition, zoom: 15);
-
-        if (mounted)
+        if (mounted) {
           newRideGoogleMapController!
               .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-        setOfMarkers.removeWhere(
-            (element) => element.markerId.value == "AnimatedMarker");
-        setOfMarkers.add(animatingMarker);
+          setOfMarkers.removeWhere(
+              (element) => element.markerId.value == "AnimatedMarker");
+          setOfMarkers.add(animatingMarker);
+        }
       });
       oldLatLng = latLngDriverPosition;
       updateDurationTimeAtRealTime();
@@ -299,6 +322,13 @@ class _DriverNewRideRequestScreenState
           .child("driverLocation")
           .set(driverLatLngDataMap);
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    streamSubscriptionRideRequestLivePosition!.cancel();
   }
 
   @override
@@ -330,7 +360,7 @@ class _DriverNewRideRequestScreenState
               var driverCurrentLatLng = LatLng(userCurrentLocation!.latitude,
                   userCurrentLocation!.longitude);
 
-              var userPickUpLatLng = rideRequestDetail.sourceLatLng;
+              var userPickUpLatLng = localRideRequestDetail!.sourceLatLng;
 
               drawPolyLineFromSourceToDestination(
                   driverCurrentLatLng, userPickUpLatLng!);
@@ -386,7 +416,7 @@ class _DriverNewRideRequestScreenState
                     Row(
                       children: [
                         Text(
-                          rideRequestDetail.userName!,
+                          localRideRequestDetail!.userName!,
                           style: const TextStyle(
                             fontSize: 20,
                             color: kPrimaryColor,
@@ -417,7 +447,7 @@ class _DriverNewRideRequestScreenState
                         Expanded(
                           child: Container(
                             child: Text(
-                              rideRequestDetail.sourceAddress!,
+                              localRideRequestDetail!.sourceAddress!,
                               style: const TextStyle(
                                   fontSize: 16, color: Colors.black87),
                             ),
@@ -442,7 +472,7 @@ class _DriverNewRideRequestScreenState
                         Expanded(
                           child: Container(
                             child: Text(
-                              rideRequestDetail.destinationAddress!,
+                              localRideRequestDetail!.destinationAddress!,
                               style: const TextStyle(
                                   fontSize: 16, color: Colors.black87),
                             ),
@@ -470,41 +500,51 @@ class _DriverNewRideRequestScreenState
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           if (rideRequestStatus == "accepted") {
-                            rideRequestStatus = "arrived";
+                            developer.log("durationFromSourceToDesitnation : " +
+                                (durationFromSourceToDestinationInt)
+                                    .toString());
 
-                            FirebaseDatabase.instance
-                                .ref()
-                                .child("ride_request")
-                                .child(localRideRequestDetail!.rideRequestId!)
-                                .child("status")
-                                .set(rideRequestStatus);
+                            if (durationFromSourceToDestinationInt <= 240) {
+                              rideRequestStatus = "arrived";
 
-                            FirebaseDatabase.instance
-                                .ref()
-                                .child("users")
-                                .child(localRideRequestDetail!.userId!)
-                                .child("ride_request")
-                                .set(rideRequestStatus);
+                              FirebaseDatabase.instance
+                                  .ref()
+                                  .child("ride_request")
+                                  .child(localRideRequestDetail!.rideRequestId!)
+                                  .child("status")
+                                  .set(rideRequestStatus);
 
-                            setState(() {
-                              buttonTitle = "Start Ride Request";
-                              buttonColor = kSecondaryColor;
-                            });
+                              FirebaseDatabase.instance
+                                  .ref()
+                                  .child("users")
+                                  .child(localRideRequestDetail!.userId!)
+                                  .child("ride_request")
+                                  .set(rideRequestStatus);
 
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext c) => ProgressDialog(
-                                message: "Loading..",
-                              ),
-                            );
+                              setState(() {
+                                buttonTitle = "Start Ride Request";
+                                buttonColor = kSecondaryColor;
+                              });
 
-                            await drawPolyLineFromSourceToDestination(
-                              rideRequestDetail.sourceLatLng!,
-                              rideRequestDetail.destinationLatLng!,
-                            );
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext c) => ProgressDialog(
+                                  message: "Loading..",
+                                ),
+                              );
 
-                            Navigator.pop(context);
+                              await drawPolyLineFromSourceToDestination(
+                                localRideRequestDetail!.sourceLatLng!,
+                                localRideRequestDetail!.destinationLatLng!,
+                              );
+
+                              Navigator.pop(context);
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg:
+                                      "You've yet to reached the pickup point!");
+                            }
                           } else if (rideRequestStatus == "arrived") {
                             rideRequestStatus = "onriderequest";
 
@@ -537,7 +577,13 @@ class _DriverNewRideRequestScreenState
 
                             Navigator.pop(context);
                           } else if (rideRequestStatus == "onriderequest") {
-                            endRideRequest();
+                            if (durationFromSourceToDestinationInt <= 240) {
+                              endRideRequest();
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg:
+                                      "You've yet to reached the destination!");
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(

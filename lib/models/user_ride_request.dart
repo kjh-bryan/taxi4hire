@@ -33,7 +33,7 @@ class UserRideRequest {
         double.parse((snap.value as dynamic)["destination"]["latitude"]),
         double.parse((snap.value as dynamic)["destination"]["longitude"]));
     sourceAddress = (snap.value as dynamic)["sourceAddress"];
-    destinationAddress = (snap.value as dynamic)["desinationAddress"];
+    destinationAddress = (snap.value as dynamic)["destinationAddress"];
     userName = (snap.value as dynamic)["name"];
     userPhone = (snap.value as dynamic)["mobile"];
     userId = (snap.value as dynamic)["userId"];

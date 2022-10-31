@@ -19,6 +19,7 @@ import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
 import 'package:taxi4hire/main.dart';
 import 'package:taxi4hire/models/direction_details_info.dart';
+import 'package:taxi4hire/models/directions.dart';
 import 'package:taxi4hire/models/taxi_type_list.dart';
 import 'package:taxi4hire/models/user_model.dart';
 import 'package:taxi4hire/screens/main_map/components/search_places_screen.dart';
@@ -63,6 +64,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
   String userRideRequestStatus = "";
   String isRequestingStatus = "idle";
   String driverRideStatus = "Taxi is arriving";
+  bool existingRide = false;
   bool hasDriver = false;
   bool requestPositionInfo = true;
 
@@ -82,6 +84,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     setState(() {
       findingARideContainerHeight = SizeConfig.screenHeight! * 0.38;
       selectARideContainerHeight = 0;
+      searchLocationContainerHeight = 0;
     });
   }
 
@@ -94,6 +97,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
 
   assignedDriverInfoUI() {
     setState(() {
+      searchLocationContainerHeight = 0;
       selectARideContainerHeight = 0;
       assignedDriverInfoContainerHeight = SizeConfig.screenHeight! * 0.38;
     });
@@ -109,14 +113,17 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
 
     CameraPosition cameraPosition =
         CameraPosition(target: latLngPosition, zoom: 14);
-
-    newGoogleMapController!
-        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    if (newGoogleMapController != null && !existingRide)
+      newGoogleMapController!
+          .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
     String humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCoordinates(
             userCurrentLocation!, context);
-    print("This is your current readable address : " + humanReadableAddress);
+
+    Future.delayed(Duration(seconds: 3), () {
+      checkIfExistingRideRequest();
+    });
   }
 
   Future<void> drawPolyLineFromSourceToDestination() async {
@@ -140,23 +147,22 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     var directionDetailsInfo =
         await AssistantMethods.obtainOriginToDestinationDirectionDetails(
             sourceLatLng, destinationLatLng);
-    if (directionDetailsInfo != null) {
-      showSelectARideUI();
-    }
+
     setState(() {
       tripDirectionDetailsInfo = directionDetailsInfo;
     });
     Navigator.pop(context);
     developer.log("drawPolyLineFromSourceToDestination",
         name: "BookRequestTab");
-    print("\nDEBUG : home_tab > drawPolyLineFromSourceToDestination\n");
-    print("\nDEBUG :These are the points = ");
-    print("\nDEBUG :" + directionDetailsInfo!.ePoints.toString());
 
     PolylinePoints pPoints = PolylinePoints();
     List<PointLatLng> decodedPolyLinePointsResultList =
-        pPoints.decodePolyline(directionDetailsInfo.ePoints!);
+        pPoints.decodePolyline(directionDetailsInfo!.ePoints!);
 
+    developer.log(
+        "decodedPolyLinePointsResultList " +
+            decodedPolyLinePointsResultList.toString(),
+        name: "BookRequestTab");
     pLineCoordinatesList.clear();
 
     if (decodedPolyLinePointsResultList.isNotEmpty) {
@@ -165,37 +171,11 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
             .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
       });
     }
-
-    double premiumPrice =
-        AssistantMethods.calculateFareAmountFromSourceToDestination(
-            directionDetailsInfo, "premium");
-    double standardPrice =
-        AssistantMethods.calculateFareAmountFromSourceToDestination(
-            directionDetailsInfo, "standard");
-
-    TaxiTypeList tPremium = TaxiTypeList(
-        imgUrl: "assets/images/premium.png",
-        type: "Premium",
-        distance: directionDetailsInfo.distanceText,
-        duration: directionDetailsInfo.durationText,
-        price: premiumPrice.toString());
-
-    TaxiTypeList tStandard = TaxiTypeList(
-        imgUrl: "assets/images/standard.png",
-        type: "Standard",
-        distance: directionDetailsInfo.distanceText,
-        duration: directionDetailsInfo.durationText,
-        price: standardPrice.toString());
     polyLineSet.clear();
-
-    taxiList.clear();
     setState(() {
-      taxiList.add(tStandard);
-      // taxiList.add(tPremium);
-
       Polyline polyline = Polyline(
         color: kPrimaryColor,
-        polylineId: PolylineId("PolylineID"),
+        polylineId: const PolylineId("PolylineID2"),
         jointType: JointType.round,
         points: pLineCoordinatesList,
         startCap: Cap.roundCap,
@@ -203,8 +183,9 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
         geodesic: true,
       );
       polyLineSet.add(polyline);
+      developer.log("setState Polyline",
+          name: "BookRequestTab > drawPolyLineFromSourceToDestination");
     });
-
     LatLngBounds boundsLatLng;
     double southWestLat;
     double southWestLong;
@@ -232,10 +213,10 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     );
 
     newGoogleMapController!
-        .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 60));
+        .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 70));
 
     Marker sourceMarker = Marker(
-      markerId: MarkerId("sourceId"),
+      markerId: const MarkerId("sourceId"),
       infoWindow:
           InfoWindow(title: sourcePosition.locationName, snippet: "From"),
       position: sourceLatLng,
@@ -243,7 +224,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     );
 
     Marker destinationMarker = Marker(
-      markerId: MarkerId("destinationId"),
+      markerId: const MarkerId("destinationId"),
       infoWindow: InfoWindow(
           title: destinationPosition.locationName, snippet: "Destination"),
       position: destinationLatLng,
@@ -256,7 +237,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
     });
 
     Circle sourceCircle = Circle(
-      circleId: CircleId("sourceId"),
+      circleId: const CircleId("sourceId"),
       fillColor: Colors.green,
       radius: 12,
       strokeWidth: 3,
@@ -278,6 +259,40 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
 
       circlesSet.add(destinationCircle);
     });
+
+    if (!existingRide) addTaxiToList(directionDetailsInfo);
+  }
+
+  addTaxiToList(directionDetailsInfo) {
+    if (directionDetailsInfo != null) {
+      showSelectARideUI();
+    }
+    // double premiumPrice =
+    //     AssistantMethods.calculateFareAmountFromSourceToDestination(
+    //         directionDetailsInfo, "premium");
+    double standardPrice =
+        AssistantMethods.calculateFareAmountFromSourceToDestination(
+            directionDetailsInfo, "standard");
+
+    // TaxiTypeList tPremium = TaxiTypeList(
+    //     imgUrl: "assets/images/premium.png",
+    //     type: "Premium",
+    //     distance: directionDetailsInfo.distanceText,
+    //     duration: directionDetailsInfo.durationText,
+    //     price: premiumPrice.toString());
+
+    TaxiTypeList tStandard = TaxiTypeList(
+        imgUrl: "assets/images/standard.png",
+        type: "Standard",
+        distance: directionDetailsInfo.distanceText,
+        duration: directionDetailsInfo.durationText,
+        price: standardPrice.toString());
+
+    taxiList.clear();
+    setState(() {
+      taxiList.add(tStandard);
+      // taxiList.add(tPremium);
+    });
   }
 
   requestARideButton() {
@@ -291,23 +306,30 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
         .child("ride_request");
 
     userReference!.set("waiting");
+
+    listenToRideRequestStatus();
+  }
+
+  listenToRideRequestStatus() {
+    developer.log("In listenToRideRequestStatus()", name: "BookRequestTab");
     bool driverAcceptedRideRequest = false;
     referenceRideRequest!.child("status").onValue.listen((event) {
+      developer.log(
+          "referenceRideRequest.onValue.listen event -> " +
+              event.snapshot.value.toString(),
+          name: "BookRequestTab");
       setState(() {
         driverAcceptedRideRequest = true;
       });
     });
 
-    print("Debugging in : book_request_tab > requestARideButton : " +
-        driverAcceptedRideRequest.toString());
-
     tripRideRequestInfoStreamSubscription =
         referenceRideRequest!.onValue.listen((event) async {
-      print(
-          "Debugging in : book_request_tab > tripRideRequestInfoStreamSubscription.listen");
+      developer.log(
+          "tripRideRequestInfoStreamSubscription -> " +
+              event.snapshot.value.toString(),
+          name: "BookRequestTab");
       if (driverAcceptedRideRequest) {
-        print(
-            "Debugging in : book_request_tab > tripRideRequestInfoStreamSubscription.listen > driverAcceptedRideRequest");
         if (event.snapshot.value == null) {
           return;
         }
@@ -353,10 +375,6 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
         }
 
         if ((event.snapshot.value as Map)["driverLocation"] != null) {
-          print(
-              "Debugging in : book_request_tab > tripRideRequestInfoStreamSubscription.listen > driverAcceptedRideRequest > event.snap.value " +
-                  event.snapshot.value.toString());
-
           double driverCurrentPositionLat = double.parse(
               (event.snapshot.value as Map)["driverLocation"]["latitude"]
                   .toString());
@@ -443,6 +461,9 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
   }
 
   updateArrivalTimeToUserPickupLocation(driverCurrentPositionLatLng) async {
+    developer.log(
+        "requestPositionInfo : " + requestPositionInfo.toString() + "\n",
+        name: "BookRequestTab >  updateArrivalTimeToUserPickupLocation");
     if (requestPositionInfo == true) {
       requestPositionInfo = false;
 
@@ -454,6 +475,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
               driverCurrentPositionLatLng, userPickUpPosition);
 
       if (directionDetailsInfo == null) {
+        requestPositionInfo = true;
         return;
       }
 
@@ -482,6 +504,7 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
               driverCurrentPositionLatLng, userDestinationPosition);
 
       if (directionDetailsInfo == null) {
+        requestPositionInfo = true;
         return;
       }
 
@@ -492,6 +515,79 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
 
       requestPositionInfo = true;
     }
+  }
+
+  checkIfExistingRideRequest() async {
+    developer.log(
+        "checkIfExistingRideRequest() rideStatus : ${userModelCurrentInfo!.rideRequestStatus!}\n",
+        name: "BookRequestTab");
+    if (userModelCurrentInfo!.rideRequestStatus! != "idle") {
+      DatabaseReference rideRequestRef =
+          FirebaseDatabase.instance.ref().child("ride_request");
+
+      var snapshot = await rideRequestRef.get();
+
+      Map snap = snapshot.value as Map;
+      developer.log("snap : " + snap.entries.toString() + "\n",
+          name: "BookRequestTab");
+      snap.forEach((key, value) async {
+        String userId = (value as dynamic)["userId"];
+        String status = (value as dynamic)["status"];
+        Directions userPickUpAddress = Directions();
+        userPickUpAddress.humanReadableAddress =
+            (value as dynamic)["sourceAddress"];
+        userPickUpAddress.locationName = (value as dynamic)["sourceAddress"];
+        userPickUpAddress.locationLatitude =
+            double.parse((value as dynamic)["source"]["latitude"]);
+        userPickUpAddress.locationLongitude =
+            double.parse((value as dynamic)["source"]["longitude"]);
+
+        Directions userDropOffAddress = Directions();
+        userDropOffAddress.humanReadableAddress =
+            (value as dynamic)["destinationAddress"];
+        userDropOffAddress.locationName =
+            (value as dynamic)["destinationAddress"];
+        userDropOffAddress.locationLatitude =
+            double.parse((value as dynamic)["destination"]["latitude"]);
+        userDropOffAddress.locationLongitude =
+            double.parse((value as dynamic)["destination"]["longitude"]);
+
+        developer.log("userId : " + userId.toString() + "\n",
+            name: "BookRequestTab");
+
+        developer.log("status : " + status.toString() + "\n",
+            name: "BookRequestTab");
+
+        if (userId == userModelCurrentInfo!.id! && status != "ended") {
+          developer.log(
+              "Setting referenceRideRequest key : " + key.toString() + "\n",
+              name: "BookRequestTab");
+          setState(() {
+            isRequestingStatus = "waiting";
+            googleMapPadding = SizeConfig.screenHeight! * 0.38;
+          });
+          referenceRideRequest =
+              FirebaseDatabase.instance.ref().child("ride_request").child(key);
+
+          Provider.of<AppInfo>(context, listen: false)
+              .updatePickUpLocationAddress(userPickUpAddress);
+
+          Provider.of<AppInfo>(context, listen: false)
+              .updateDropOffLocationAddress(userDropOffAddress);
+          existingRide = true;
+          Future.delayed(const Duration(seconds: 2), () {});
+          await drawPolyLineFromSourceToDestination();
+          listenToRideRequestStatus();
+          assignedDriverInfoUI();
+        }
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
@@ -1086,11 +1182,19 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
                       ),
                       Text(
                         Provider.of<AppInfo>(context).userPickUpLocation != null
-                            ? (Provider.of<AppInfo>(context)
-                                        .userPickUpLocation!
-                                        .locationName!)
-                                    .substring(0, 32) +
-                                "..."
+                            ? ((Provider.of<AppInfo>(context)
+                                            .userPickUpLocation!
+                                            .locationName!)
+                                        .length >
+                                    20)
+                                ? (Provider.of<AppInfo>(context)
+                                            .userPickUpLocation!
+                                            .locationName!)
+                                        .substring(0, 20) +
+                                    "..."
+                                : (Provider.of<AppInfo>(context)
+                                    .userPickUpLocation!
+                                    .locationName!)
                             : "Your current location",
                         style: TextStyle(
                           color: Colors.black54,
@@ -1130,7 +1234,9 @@ class _BookRequestsTabPageState extends State<BookRequestsTabPage>
                       setState(() {
                         googleMapPadding = SizeConfig.screenHeight! * 0.38;
                       });
-                      await drawPolyLineFromSourceToDestination();
+                      Future.delayed(Duration(seconds: 1), () async {
+                        await drawPolyLineFromSourceToDestination();
+                      });
                     }
                   }
                 },

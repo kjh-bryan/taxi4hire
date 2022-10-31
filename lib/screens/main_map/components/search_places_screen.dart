@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:taxi4hire/assistants/request_assistant.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/map_controller.dart';
 import 'package:taxi4hire/models/predicted_places.dart';
 import 'package:taxi4hire/screens/main_map/components/place_prediction_tile.dart';
 import 'package:taxi4hire/size_config.dart';
+import 'dart:developer' as developer;
 
 class SearchPlacesScreen extends StatefulWidget {
   const SearchPlacesScreen({Key? key}) : super(key: key);
@@ -17,33 +19,12 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
   List<PredictedPlaces> placesPredictedList = [];
 
   void findPlacesAutoCompleteSearch(String inputText) async {
-    if (inputText.length > 1) {
-      String urlAutoCompleteSearch =
-          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=${FlutterConfig.get('MAP_API_KEY')}&components=country:SG";
-
-      var responseAutoCompleteSearch =
-          await RequestAssistant.receiveRequest(urlAutoCompleteSearch);
-
-      if (responseAutoCompleteSearch == "error_occured") {
-        return;
-      }
-
-      if (responseAutoCompleteSearch["status"] == "OK") {
-        var placePredictions = responseAutoCompleteSearch["predictions"];
-
-        var placesPredictionsList = (placePredictions as List)
-            .map((jsonData) => PredictedPlaces.fromJson(jsonData))
-            .toList();
-
-        setState(() {
-          placesPredictedList = placesPredictionsList;
-        });
-      }
-
-      print("DEBUG : SearchPlaceScreen > findPlacesAutoCompleteSearch ");
-    } else if (inputText.length < 1) {
+    List<PredictedPlaces> newPredictedPlacesList =
+        await MapController.findAutoCompletePlaces(
+            inputText, placesPredictedList);
+    if (newPredictedPlacesList != placesPredictedList) {
       setState(() {
-        placesPredictedList.clear();
+        placesPredictedList = newPredictedPlacesList;
       });
     }
   }
@@ -56,7 +37,7 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
           //Search place UI
           Container(
             height: getProportionateScreenHeight(160),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
@@ -83,7 +64,7 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.arrow_back,
                           color: kPrimaryColor,
                         ),
@@ -104,7 +85,7 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                   ),
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.adjust_sharp,
                         color: kPrimaryColor,
                       ),
@@ -116,7 +97,13 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             onChanged: (valueType) {
-                              findPlacesAutoCompleteSearch(valueType);
+                              if (valueType.isNotEmpty) {
+                                findPlacesAutoCompleteSearch(valueType);
+                              } else {
+                                setState(() {
+                                  placesPredictedList.clear();
+                                });
+                              }
                             },
                             decoration: InputDecoration(
                               hintText: "Search Here",
@@ -142,18 +129,17 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
           ),
 
           //Display auto complete places result
-
-          (placesPredictedList.length > 0)
+          (placesPredictedList.isNotEmpty)
               ? Expanded(
                   child: ListView.separated(
-                    physics: ClampingScrollPhysics(),
+                    physics: const ClampingScrollPhysics(),
                     itemBuilder: (context, index) {
                       return PlacePredictionTile(
                         predictedPlaces: placesPredictedList[index],
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) {
-                      return Divider(
+                      return const Divider(
                         color: Colors.grey,
                         height: 1,
                         thickness: 1,

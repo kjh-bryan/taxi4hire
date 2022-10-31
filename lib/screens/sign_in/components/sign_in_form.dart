@@ -4,6 +4,7 @@ import 'package:taxi4hire/components/default_button.dart';
 import 'package:taxi4hire/components/form_error.dart';
 import 'package:taxi4hire/components/suffix_icon.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/map_controller.dart';
 import 'package:taxi4hire/controller/user_controller.dart';
 import 'package:taxi4hire/size_config.dart';
 
@@ -32,28 +33,11 @@ class _SignFormState extends State<SignForm> {
     super.dispose();
   }
 
-  checkIfLocationPermissionAllowed() async {
-    _locationPermission = await Geolocator.checkPermission();
-
-    if (_locationPermission == LocationPermission.always ||
-        _locationPermission == LocationPermission.whileInUse) {
-      return;
-    }
-
-    if (_locationPermission == LocationPermission.denied) {
-      _locationPermission = await Geolocator.requestPermission();
-
-      if (_locationPermission == LocationPermission.denied) {
-        _locationPermission = await Geolocator.requestPermission();
-      }
-    }
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    checkIfLocationPermissionAllowed();
+    MapController.checkIfLocationPermissionAllowed(_locationPermission);
   }
 
   @override
@@ -106,7 +90,7 @@ class _SignFormState extends State<SignForm> {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 UserController.signInUser(
-                    context, emailController, passwordController, remember);
+                    context, emailController, passwordController);
               }
             },
           ),

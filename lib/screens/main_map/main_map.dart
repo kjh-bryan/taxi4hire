@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/constants.dart';
+import 'package:taxi4hire/controller/booking_controller.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
+import 'package:taxi4hire/models/user_model.dart';
 import 'package:taxi4hire/screens/main_map/tabs/book_request_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/booking_requests_tab.dart';
 import 'package:taxi4hire/screens/main_map/tabs/home_tab.dart';
@@ -23,6 +26,7 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
   late final tabController = TabController(length: 3, vsync: this);
   int selectedIndex = 0;
   var geoLocation = Geolocator();
+  UserModel? localUserModel;
 
   onItemClicked(int index) {
     setState(() {
@@ -34,6 +38,7 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
   LocationPermission? _locationPermission;
 
   checkIfLocationPermissionAllowed() async {
+    localUserModel = await AssistantMethods.readCurrentOnlineUserInfo();
     _locationPermission = await Geolocator.requestPermission();
 
     if (_locationPermission == LocationPermission.denied) {
@@ -59,6 +64,7 @@ class _MainMapState extends State<MainMap> with SingleTickerProviderStateMixin {
   void dispose() {
     tabController.dispose();
     super.dispose();
+    streamSubscriptionLivePosition!.cancel();
   }
 
   @override

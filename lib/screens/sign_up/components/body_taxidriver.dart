@@ -215,7 +215,7 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
         if (value!.isEmpty) {
           addError(error: kMobileNoNullError);
           return "";
-        } else if (value.length < 8 && value.length > 8) {
+        } else if (value.length < 8 || value.length > 8) {
           addError(error: kInvalidMobileNoError);
           return "";
         }
@@ -357,15 +357,18 @@ class _SignUpTaxiDriverFormState extends State<SignUpTaxiDriverForm> {
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kEmailNullError);
-        } else if (emailValidatorRegExp.hasMatch(value)) {
+        }
+        if (emailValidatorRegExp.hasMatch(value)) {
           removeError(error: kInvalidEmailError);
         }
+        return null;
       },
       validator: (value) {
         if (value!.isEmpty) {
           addError(error: kEmailNullError);
           return "";
-        } else if (!emailValidatorRegExp.hasMatch(value)) {
+        }
+        if (!emailValidatorRegExp.hasMatch(value)) {
           addError(error: kInvalidEmailError);
           return "";
         }

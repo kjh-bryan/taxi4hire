@@ -1,5 +1,6 @@
 import 'dart:convert' as convert;
 
+import 'package:flutter_config/flutter_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,13 @@ import 'dart:developer' as developer;
 import 'package:collection/collection.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:taxi4hire/assistants/request_assistant.dart';
+import 'package:taxi4hire/components/progress_dialog.dart';
+import 'package:taxi4hire/global/global.dart';
+import 'package:taxi4hire/infohandler/app_info.dart';
+import 'package:taxi4hire/models/directions.dart';
+import 'package:taxi4hire/models/predicted_places.dart';
 
 class MapController {
   static void checkIfLocationPermissionAllowed(
@@ -22,11 +30,121 @@ class MapController {
     if (_locationPermission == LocationPermission.denied) {
       _locationPermission = await Geolocator.requestPermission();
 
-      if (_locationPermission == LocationPermission.denied) {
+      if (_locationPermission == LocationPermission.deniedForever) {
         _locationPermission = await Geolocator.requestPermission();
       }
     }
   }
+
+  static Future<void> locateUserPosition() async {
+    LocationPermission permission;
+
+    permission = await Geolocator.requestPermission();
+
+    MapController.checkIfLocationPermissionAllowed(permission);
+
+    Position cPosition;
+    try {
+      cPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      userCurrentLocation = cPosition;
+    } catch (exception) {
+      developer.log("Exception occured : " + exception.toString(),
+          name: "MapController > locateUserPosition");
+    }
+  }
+
+  /*
+  GoogleMap API
+
+  */
+  static Future<List<PredictedPlaces>> findAutoCompletePlaces(
+      String inputText, List<PredictedPlaces> oldPlacesPredictedList) async {
+    if (inputText.length > 1) {
+      String urlAutoCompleteSearch =
+          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=${FlutterConfig.get('MAP_API_KEY')}&components=country:SG";
+
+      var responseAutoCompleteSearch =
+          await RequestAssistant.receiveRequest(urlAutoCompleteSearch);
+
+      if (responseAutoCompleteSearch == "error_occured") {
+        return oldPlacesPredictedList;
+      }
+
+      if (responseAutoCompleteSearch["status"] == "OK") {
+        var placePredictions = responseAutoCompleteSearch["predictions"];
+
+        var placesPredictionsList = (placePredictions as List)
+            .map((jsonData) => PredictedPlaces.fromJson(jsonData))
+            .toList();
+
+        // setState(() {
+        //   placesPredictedList = placesPredictionsList;
+        // });
+        return placesPredictionsList;
+      }
+      developer.log("setState > placesPredictedList = placesPredictionList",
+          name: "search_places_screen > findPlacesAutoCompleteSearch");
+    }
+    return oldPlacesPredictedList;
+  }
+
+  static void getPlaceDirectionDetails(String? placeId, context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => const ProgressDialog(
+        message: "Setting up drop off location",
+      ),
+    );
+
+    String placeDirectionDetailsUrl =
+        "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=${FlutterConfig.get('MAP_API_KEY')}";
+
+    var responsePlaceId =
+        await RequestAssistant.receiveRequest(placeDirectionDetailsUrl);
+
+    Navigator.pop(context);
+    if (responsePlaceId == "error_occured") {
+      developer.log("responsePlaceId == 'error_occured'",
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
+      return;
+    }
+
+    if (responsePlaceId["status"] == "OK") {
+      Directions directions = Directions();
+      directions.locationName = responsePlaceId["result"]["name"];
+      directions.locationLatitude =
+          responsePlaceId["result"]["geometry"]["location"]["lat"];
+      directions.locationLongitude =
+          responsePlaceId["result"]["geometry"]["location"]["lng"];
+      directions.locationId = placeId;
+      developer.log("responsePlaceId['status'] == 'OK'",
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
+
+      developer.log("Location Name : " + directions.locationName!,
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
+
+      developer.log(
+          "Location Latitude : " + directions.locationLatitude!.toString(),
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
+
+      developer.log(
+          "Location Longitude : " + directions.locationLongitude!.toString(),
+          name: "PlacePredictionTile > getPlaceDirectionDetails");
+
+      Provider.of<AppInfo>(context, listen: false)
+          .updateDropOffLocationAddress(directions);
+
+      Navigator.pop(context, "obtainedDropOff");
+    }
+  }
+
+  /*
+  Data Gov API
+
+  */
 
   static Future<Set<Marker>> getTaxiAvailability() async {
     developer.log("getTaxiAvailability() was called", name: "MapController");

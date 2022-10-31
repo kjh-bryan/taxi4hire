@@ -107,6 +107,7 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                     userModelCurrentInfo = null;
                     currentFirebaseUser = null;
                     await firebaseAuth.signOut();
+                    streamSubscriptionLivePosition!.cancel();
                     Navigator.popAndPushNamed(context, SignInScreen.routeName);
                     Provider.of<AppInfo>(context, listen: false).logOut();
                   },

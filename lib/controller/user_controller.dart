@@ -8,9 +8,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi4hire/assistants/assistant_methods.dart';
 import 'package:taxi4hire/components/progress_dialog.dart';
+import 'package:taxi4hire/controller/booking_controller.dart';
 import 'package:taxi4hire/controller/map_controller.dart';
 import 'package:taxi4hire/global/global.dart';
 import 'package:taxi4hire/infohandler/app_info.dart';
+import 'package:taxi4hire/models/user_model.dart';
 import 'package:taxi4hire/screens/main_map/main_map.dart';
 import 'package:taxi4hire/screens/sign_in/sign_in_screen.dart';
 import 'dart:developer' as developer;
@@ -19,8 +21,7 @@ class UserController {
   static void signInUser(
       BuildContext context,
       TextEditingController emailController,
-      TextEditingController passwordController,
-      bool remember) async {
+      TextEditingController passwordController) async {
     developer.log("Signing in User ", name: "UserController > signInUser");
     showDialog(
         context: context,
@@ -107,32 +108,29 @@ class UserController {
 
       firebaseUser = userCredential.user!;
 
-      if (firebaseUser != null) {
-        Map userMap = {
-          "id": firebaseUser.uid,
-          "email": emailController.text.trim(),
-          "name": nameController.text.trim(),
-          "mobile": mobileNoController.text.trim(),
-          "license_plate": licenseNoController != null
-              ? licenseNoController.text.trim()
-              : "",
-          "role": role,
-          "ride_request": "idle"
-          //role : 1 as passenger
-        };
+      Map userMap = {
+        "id": firebaseUser.uid,
+        "email": emailController.text.trim(),
+        "name": nameController.text.trim(),
+        "mobile": mobileNoController.text.trim(),
+        "license_plate":
+            licenseNoController != null ? licenseNoController.text.trim() : "",
+        "role": role,
+        "ride_request": "idle"
+        //role : 1 as passenger
+      };
 
-        DatabaseReference taxiDriversRef =
-            FirebaseDatabase.instance.ref().child('users');
+      DatabaseReference taxiDriversRef =
+          FirebaseDatabase.instance.ref().child('users');
 
-        taxiDriversRef.child(firebaseUser.uid).set(userMap);
+      taxiDriversRef.child(firebaseUser.uid).set(userMap);
 
-        currentFirebaseUser = firebaseUser;
+      currentFirebaseUser = firebaseUser;
 
-        Fluttertoast.showToast(msg: "Registration successful, Redirecting..");
+      Fluttertoast.showToast(msg: "Registration successful, Redirecting..");
 
-        Navigator.pop(context);
-        signInExistingUser(context);
-      }
+      Navigator.pop(context);
+      signInExistingUser(context);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         Fluttertoast.showToast(msg: "The password provided is too weak.");
@@ -153,7 +151,8 @@ class UserController {
 
   static signInExistingUser(
     BuildContext context,
-  ) {
+  ) async {
+    UserModel? userModel;
     if (firebaseAuth.currentUser != null) {
       showDialog(
           context: context,
@@ -161,7 +160,9 @@ class UserController {
           builder: (BuildContext c) {
             return const ProgressDialog(message: "Logging you in..");
           });
-      AssistantMethods.readCurrentOnlineUserInfo();
+      userModel = await AssistantMethods.readCurrentOnlineUserInfo();
+      developer.log("User role : " + userModel!.role!,
+          name: "UserController > signInExistingUser");
     }
     Timer(const Duration(seconds: 3), () async {
       if (firebaseAuth.currentUser != null) {
@@ -174,7 +175,18 @@ class UserController {
         LocationPermission? locationPermission;
         MapController.checkIfLocationPermissionAllowed(locationPermission);
         Navigator.pop(context);
-        Navigator.popAndPushNamed(context, MainMap.routeName);
+        if (userModel != null) {
+          developer.log("userModel != null : " + userModel.role!,
+              name: "UserController > signInExistingUser");
+          if (userModel.role == "0" && userModel.rideRequestStatus != "idle") {
+            BookingController.getRideRequest(context);
+          } else {
+            Navigator.popAndPushNamed(context, MainMap.routeName);
+          }
+        } else {
+          Navigator.popAndPushNamed(context, MainMap.routeName);
+        }
+
         // Navigator.popAndPushNamed(
         //                       context, MainMap.routeName);
       }
