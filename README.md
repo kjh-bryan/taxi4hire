@@ -18,19 +18,11 @@
 
 <h3 align="center">Taxi 4 Hire</h3>
 
-<!--
-  <p align="center">
-    project_description
+   <p align="center">
+     Taxi Drivers's best friend
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
+    <a href="https://youtu.be/fGw4i2YiVOU">View Demo</a>
   </p>
-
--->
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -72,6 +64,8 @@ Taxi 4 Hire is an application for
 
 - Taxi Driver to view surroundings nearby Taxi Drivers to let them know whether the vicinity is crowded thus allowing them to plan where to wait for customer.
 - Customer at Taxi Stand to book a Taxi Driver efficiency.
+
+This project is submitted to Nanyang Technological University as part of a graded assignment for the course SC2006(Software Engineering).
 
 <!-- Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
 -->
